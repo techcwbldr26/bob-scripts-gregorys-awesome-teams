@@ -13,7 +13,7 @@ import { promisify } from 'node:util';
 import { after, describe, it } from 'node:test';
 
 import { COVERAGE_GATE, payloadRoot, readSkills } from '../src/payload.mjs';
-import { cleanup, tempDir } from './helpers.mjs';
+import { cleanup } from './helpers.mjs';
 
 const run = promisify(execFile);
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -48,22 +48,42 @@ describe('the banner is in the README', () => {
 });
 
 describe('the banner matches its generator', () => {
+  it('is checked out with LF endings', async () => {
+    // The generator writes LF. Without `* text=auto eol=lf` in .gitattributes a
+    // Windows checkout rewrites this file to CRLF and the drift check below
+    // fails for a reason that has nothing to do with the banner's content.
+    const raw = await fs.readFile(BANNER);
+    assert.equal(
+      raw.includes('\r'.charCodeAt(0)),
+      false,
+      'assets/banner.svg contains CR — check the .gitattributes rules',
+    );
+  });
+
   it('does not drift from tools/build-banner.mjs', async () => {
     const committed = await svg();
-    const scratch = await tempDir('banner');
-    // Regenerate into a copy of the repo layout so the real file is untouched.
-    const out = path.join(scratch, 'assets', 'banner.svg');
-    await fs.mkdir(path.dirname(out), { recursive: true });
     await run(process.execPath, [path.join(repoRoot, 'tools', 'build-banner.mjs')], {
       cwd: repoRoot,
-      env: { ...process.env },
     });
     const regenerated = await svg();
-    assert.equal(
-      regenerated,
-      committed,
-      'assets/banner.svg is stale — run `npm run build:banner` and commit the result',
-    );
+
+    if (regenerated !== committed) {
+      // Report what differs rather than printing 37 KB of SVG at the reader.
+      const norm = (s) => s.replace(/\r\n/g, '\n');
+      assert.notEqual(
+        norm(regenerated),
+        norm(committed),
+        'only the line endings differ — see the LF check above',
+      );
+      let at = 0;
+      while (at < committed.length && committed[at] === regenerated[at]) at += 1;
+      assert.fail(
+        'assets/banner.svg is stale — run `npm run build:banner` and commit the result.\n' +
+          `First difference at character ${at} of ${committed.length}:\n` +
+          `  committed:   ...${committed.slice(Math.max(0, at - 40), at + 60)}\n` +
+          `  regenerated: ...${regenerated.slice(Math.max(0, at - 40), at + 60)}`,
+      );
+    }
   });
 });
 
