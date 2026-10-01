@@ -13,6 +13,7 @@
   "scripts": {
     "install:kit": "node src/cli.mjs",
     "verify": "node src/cli.mjs --verify",
+    "build:banner": "node tools/build-banner.mjs",
     "test": "node --test",
     "test:coverage": "node --test --experimental-test-coverage --test-coverage-exclude=\"test/**\" --test-coverage-exclude=\"scripts/**\" --test-coverage-lines=90 --test-coverage-branches=90 --test-coverage-functions=90",
     "lint:scripts": "bash scripts/lib/selfcheck.sh"

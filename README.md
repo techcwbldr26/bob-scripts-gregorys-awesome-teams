@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="assets/banner.svg"
+       alt="Animated diagram in three acts. A Bob context window fills with the system prompt, rules, MCP tools, messages, file reads and tool results until it passes the 190k compaction threshold at 193k. Compaction then collapses the older turns into a single conversation summary, leaving 12.3k and losing the middle of the conversation. Finally the kit's features appear: AGENTS.md, four always-on rules, nine skills, references and examples, the Firecrawl MCP server, the slash command, TASKS.md and four setup scripts, with the same session rerun at 38k and the build chain discover, grill, spec, implement, evals, demo."
+       width="900">
+</p>
+
 # Gregory's Awesome Teams
 
 Setup scripts that turn a plain project directory into one the **IBM Bob**

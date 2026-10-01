@@ -380,8 +380,23 @@ describe('.gitattributes', () => {
     assert.match(await attrs(), /^\*\.ps1\s+text eol=crlf$/m);
   });
 
-  it('pins the payload to LF, so Bob reads identical bytes everywhere', async () => {
-    assert.match(await attrs(), /^\*\.md\s+text eol=lf$/m);
+  it('defaults everything to LF, so a new text file is pinned without being listed', async () => {
+    // Listing extensions one at a time is how both the .sh shebang bug and the
+    // banner drift failure reached CI. The default carries the guarantee now.
+    assert.match(await attrs(), /^\* text=auto eol=lf$/m);
+  });
+
+  it('actually leaves no CR in any tracked text file but the PowerShell script', async () => {
+    const { stdout } = await run('git', ['ls-files'], { cwd: repoRoot });
+    const files = stdout.split('\n').filter(Boolean).filter((f) => !f.endsWith('.ps1'));
+    const offenders = [];
+    for (const rel of files) {
+      const buf = await fs.readFile(path.join(repoRoot, rel));
+      // Skip anything that is not text; none of these are, but be explicit.
+      if (buf.includes(0)) continue;
+      if (buf.includes('\r'.charCodeAt(0))) offenders.push(rel);
+    }
+    assert.deepEqual(offenders, [], 'these files carry CR and should be LF');
   });
 });
 
