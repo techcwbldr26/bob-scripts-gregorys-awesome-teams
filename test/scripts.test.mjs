@@ -175,7 +175,24 @@ describe('install-windows.ps1', () => {
   });
 
   it('propagates the installer exit code', async () => {
-    assert.match(await ps(), /exit \$LASTEXITCODE/);
+    assert.match(await ps(), /\$installerExitCode = \$LASTEXITCODE/);
+    assert.match(await ps(), /exit \$installerExitCode/);
+  });
+
+  it('drains node output through the pipeline, so it is not lost before exit', async () => {
+    // Calling `exit` straight after a native command discarded the installer's
+    // report on Windows. CI reads that output to check idempotence.
+    assert.match(await ps(), /& node @arguments 2>&1 \| ForEach-Object/);
+  });
+
+  it('uses Write-Output, not Write-Host, so its output can be captured', async () => {
+    const source = await ps();
+    // The explanatory comment is allowed to name it; no call sites may.
+    const callSites = source
+      .split('\n')
+      .filter((line) => !line.trimStart().startsWith('#'))
+      .filter((line) => line.includes('Write-Host'));
+    assert.deepEqual(callSites, []);
   });
 
   it('has balanced braces, parentheses and brackets', async () => {
@@ -306,5 +323,40 @@ describe('the wizard template shipped in examples/', () => {
     const source = await template();
     assert.match(source, /trap .* INT/);
     assert.match(source, /Re-run to pick up where you left off/);
+  });
+});
+
+describe('.gitattributes', () => {
+  const attrs = () => fs.readFile(path.join(repoRoot, '.gitattributes'), 'utf8');
+
+  it('pins shell scripts to LF, because CRLF breaks the shebang', async () => {
+    const source = await attrs();
+    assert.match(source, /^\*\.sh\s+text eol=lf$/m);
+    assert.match(source, /^\*\.bash\s+text eol=lf$/m);
+  });
+
+  it('pins PowerShell to CRLF', async () => {
+    assert.match(await attrs(), /^\*\.ps1\s+text eol=crlf$/m);
+  });
+
+  it('pins the payload to LF, so Bob reads identical bytes everywhere', async () => {
+    assert.match(await attrs(), /^\*\.md\s+text eol=lf$/m);
+  });
+});
+
+describe('no shell script carries CRLF line endings', () => {
+  it('checks every .sh file in the repository', async () => {
+    const files = [
+      'scripts/install-macos-intel.sh',
+      'scripts/install-macos-apple-silicon.sh',
+      'scripts/install-linux.sh',
+      'scripts/lib/common.sh',
+      'scripts/lib/selfcheck.sh',
+      'payload/examples/wizard-template.sh',
+    ];
+    for (const rel of files) {
+      const source = await fs.readFile(path.join(repoRoot, rel), 'utf8');
+      assert.ok(!source.includes('\r'), `${rel} contains a carriage return`);
+    }
   });
 });

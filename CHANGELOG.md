@@ -39,12 +39,15 @@ First release: the full kit, installable on all four target platforms.
 - **`--verify` doctor** that checks each of Bob's documented silent-failure
   modes: an invalid skill folder name, missing front matter, a name that does not
   match its folder, and an MCP server Bob cannot start.
-- **226 tests** with the coverage gate set at 90% lines, branches and functions,
+- **233 tests** with the coverage gate set at 90% lines, branches and functions,
   using Node's own test runner and no npm dependencies.
 - **CI** across Ubuntu, macOS and Windows on Node 20 and 24: the suite with the
   coverage gate, shellcheck, PowerShell parsing and PSScriptAnalyzer, payload
-  validation, and a real run of each platform's script twice to prove
-  idempotence.
+  validation, a CRLF guard on the shell scripts, and a real run of each
+  platform's script twice to prove idempotence.
+- **`.gitattributes`** pinning shell scripts to LF. A CRLF checkout breaks them
+  at the shebang, which is exactly what a Windows student running them under
+  WSL or Git Bash would hit.
 
 ### Notes
 

@@ -149,6 +149,10 @@ CI runs the suite on Ubuntu, macOS and Windows against Node 20 and 24, lints the
 shell and PowerShell scripts, validates the payload, and runs each platform's
 real setup script twice to prove it is idempotent.
 
+Node's coverage-threshold flags arrived in Node 22, so the Node 20 matrix leg
+runs the suite without the gate; the gate itself runs on every platform via
+Node 24.
+
 See [CONTRIBUTING.md](CONTRIBUTING.md) and
 [docs/architecture.md](docs/architecture.md).
 

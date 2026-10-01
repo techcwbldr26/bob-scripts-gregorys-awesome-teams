@@ -14,6 +14,10 @@ node --version   # 20+ to develop; 24+ is what Bob Shell needs
 There are no npm dependencies. The test runner and the coverage reporter are
 Node's own, so there is nothing to install.
 
+Develop on **Node 22 or later**: the coverage-threshold flags do not exist on
+Node 20, so `npm run test:coverage` cannot enforce the gate there. Node 20 is
+still supported for *running* the installer, and CI covers it.
+
 ## The loop
 
 ```bash

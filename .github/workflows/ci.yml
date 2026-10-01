@@ -37,7 +37,14 @@ jobs:
           node --version
           npm --version
 
+      # Node's coverage threshold flags arrived in Node 22, so Node 20 runs the
+      # suite without the gate. The gate still runs on every OS via Node 24.
+      - name: Run tests (no coverage gate on Node 20)
+        if: matrix.node == '20'
+        run: npm test
+
       - name: Run tests with the coverage gate
+        if: matrix.node != '20'
         run: npm run test:coverage
 
   shell:
@@ -53,6 +60,16 @@ jobs:
 
       - name: bash -n, shellcheck, exec bits, secret scan
         run: npm run lint:scripts
+
+      # A CRLF shell script fails at the shebang. .gitattributes pins these to
+      # LF; this proves it stayed pinned.
+      - name: No CRLF in any shell script
+        run: |
+          if grep -rlI $'\r' --include='*.sh' . ; then
+            echo "::error::A shell script contains CRLF line endings."
+            exit 1
+          fi
+          echo "All shell scripts are LF."
 
   powershell:
     name: PowerShell lint

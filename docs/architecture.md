@@ -150,7 +150,8 @@ script and the student runs it, so a captured key goes from terminal to `.env` o
 Node's own runner and coverage reporter; no npm dependencies. A teaching repo
 that needs a toolchain installed before its tests run teaches the wrong lesson.
 
-- 226 tests, gate at 90% lines, branches and functions.
+- 233 tests, gate at 90% lines, branches and functions. The gate needs Node 22
+  or later, so the Node 20 matrix leg runs the suite without it.
 - Every test is hermetic: `tempDir()` per test, no network, no writes outside
   temp, nothing that depends on the developer's machine.
 - The setup scripts are tested as artefacts — shape, `bash -n`, shellcheck, and a

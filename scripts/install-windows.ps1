@@ -53,22 +53,27 @@ $script:RepoUrl = if ($env:GAT_REPO_URL) { $env:GAT_REPO_URL } else {
 $script:InstallerMinNode = 20
 $script:BobShellMinNode = 24
 
-function Write-Info { param([string] $Message) Write-Host $Message }
-function Write-Ok   { param([string] $Message) Write-Host "[ok] $Message"   -ForegroundColor Green }
-function Write-Warn { param([string] $Message) Write-Host "[!]  $Message"   -ForegroundColor Yellow }
+# Write-Output rather than Write-Host throughout: Write-Host writes to the host
+# and cannot be captured or redirected, so CI could not read this script's
+# output to check that a second run is a no-op. Plain text markers replace
+# colour, matching what the shell scripts print when NO_COLOR is set.
+function Write-Info       { param([string] $Message) Write-Output $Message }
+function Write-Ok         { param([string] $Message) Write-Output "[ok] $Message" }
+function Write-Warn       { param([string] $Message) Write-Output "[!]  $Message" }
+function Write-Problem    { param([string] $Message) Write-Output "[x]  $Message" }
 
-function Stop-WithMessage {
+function Write-FatalError {
     param([string] $Message)
-    Write-Host "[x]  $Message" -ForegroundColor Red
+    Write-Problem $Message
     exit 1
 }
 
 function Show-Header {
-    Write-Host ''
-    Write-Host "Gregory's Awesome Teams" -ForegroundColor Cyan
-    Write-Host 'Prompt, context and harness engineering for the IBM Bob harness'
-    Write-Host 'Target platform: Windows 11'
-    Write-Host ''
+    Write-Output ''
+    Write-Output "Gregory's Awesome Teams"
+    Write-Output 'Prompt, context and harness engineering for the IBM Bob harness'
+    Write-Output 'Target platform: Windows 11'
+    Write-Output ''
 }
 
 # Confirm we are on Windows. PowerShell 7 runs on macOS and Linux too, where the
@@ -82,7 +87,7 @@ function Assert-Windows {
     }
 
     if (-not $onWindows) {
-        Write-Host 'Wrong script for this machine.' -ForegroundColor Red
+        Write-Problem 'Wrong script for this machine.'
         Write-Info '  This script is for Windows 11.'
         Write-Info '  On macOS run:  ./scripts/install-macos-apple-silicon.sh  (or -intel)'
         Write-Info '  On Linux run:  ./scripts/install-linux.sh'
@@ -112,19 +117,19 @@ function Assert-Node {
     $major = Get-NodeMajorVersion
 
     if ($major -eq 0) {
-        Write-Host ''
-        Write-Host 'Node.js is required and was not found.' -ForegroundColor Red
-        Write-Host ''
+        Write-Output ''
+        Write-Problem 'Node.js is required and was not found.'
+        Write-Output ''
         Write-Info "Bob Shell needs Node $script:BobShellMinNode or later, so install that version:"
         Write-Info '  winget:    winget install OpenJS.NodeJS.LTS'
         Write-Info '  Installer: https://nodejs.org/en/download'
-        Write-Host ''
-        Stop-WithMessage 'Install Node, open a new PowerShell window, and run this script again.'
+        Write-Output ''
+        Write-FatalError 'Install Node, open a new PowerShell window, and run this script again.'
     }
 
     $version = & node --version
     if ($major -lt $script:InstallerMinNode) {
-        Stop-WithMessage "Node $script:InstallerMinNode or later is required to run this installer; found $version."
+        Write-FatalError "Node $script:InstallerMinNode or later is required to run this installer; found $version."
     }
 
     if ($major -lt $script:BobShellMinNode) {
@@ -150,7 +155,7 @@ function Resolve-KitDirectory {
     $cache = Join-Path $env:LOCALAPPDATA 'gregorys-awesome-teams'
 
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-        Stop-WithMessage 'git is required to fetch the kit. Install it with "winget install Git.Git", or clone the repository and run this script from inside it.'
+        Write-FatalError 'git is required to fetch the kit. Install it with "winget install Git.Git", or clone the repository and run this script from inside it.'
     }
 
     if (Test-Path (Join-Path $cache '.git')) {
@@ -164,13 +169,13 @@ function Resolve-KitDirectory {
         if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
         & git clone --depth 1 --quiet $script:RepoUrl $cache
         if ($LASTEXITCODE -ne 0) {
-            Stop-WithMessage "Could not clone $script:RepoUrl. Check your network, or clone it by hand and run this script from inside it."
+            Write-FatalError "Could not clone $script:RepoUrl. Check your network, or clone it by hand and run this script from inside it."
         }
         Write-Ok 'Kit fetched'
     }
 
     if (-not (Test-Path (Join-Path $cache 'src/cli.mjs'))) {
-        Stop-WithMessage "The fetched kit looks incomplete: src/cli.mjs is missing from $cache."
+        Write-FatalError "The fetched kit looks incomplete: src/cli.mjs is missing from $cache."
     }
     return $cache
 }
@@ -185,7 +190,7 @@ Assert-Windows
 Assert-Node
 
 if (-not (Test-Path -PathType Container $Target)) {
-    Stop-WithMessage "Target directory does not exist: $Target"
+    Write-FatalError "Target directory does not exist: $Target"
 }
 $Target = (Resolve-Path $Target).Path
 Write-Ok "Installing into $Target"
@@ -201,5 +206,9 @@ if ($Force)  { $arguments += '--force' }
 if ($DryRun) { $arguments += '--dry-run' }
 if ($Verify) { $arguments = @((Join-Path $kit 'src/cli.mjs'), '--target', $Target, '--verify') }
 
-& node @arguments
-exit $LASTEXITCODE
+# Drain node's output through the pipeline before exiting. Calling `exit`
+# straight after a native command can discard output that has not been flushed,
+# which is why neither run's installer report reached CI.
+& node @arguments 2>&1 | ForEach-Object { Write-Output $_ }
+$installerExitCode = $LASTEXITCODE
+exit $installerExitCode

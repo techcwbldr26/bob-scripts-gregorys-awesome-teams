@@ -1,0 +1,19 @@
+# Normalise text by default.
+* text=auto
+
+# Shell scripts MUST be LF. A CRLF checkout makes them fail at the shebang with
+# "bad interpreter: /usr/bin/env bash^M", which is what a Windows student hits
+# when running them under WSL or Git Bash.
+*.sh      text eol=lf
+*.bash    text eol=lf
+
+# PowerShell is a Windows artefact; keep it CRLF.
+*.ps1     text eol=crlf
+
+# The payload is written into student projects and read by Bob. Keep it LF so a
+# skill or rule is byte-identical no matter who checked it out.
+*.md      text eol=lf
+*.mjs     text eol=lf
+*.json    text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
