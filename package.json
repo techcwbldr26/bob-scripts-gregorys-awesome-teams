@@ -1,0 +1,21 @@
+{
+  "name": "gregorys-awesome-teams",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prompt, context and harness engineering kit for university teams building on the IBM Bob harness.",
+  "type": "module",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "bin": {
+    "gat-install": "./src/cli.mjs"
+  },
+  "scripts": {
+    "install:kit": "node src/cli.mjs",
+    "verify": "node src/cli.mjs --verify",
+    "test": "node --test \"test/*.test.mjs\"",
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-exclude=\"test/**\" --test-coverage-exclude=\"scripts/**\" --test-coverage-lines=90 --test-coverage-branches=90 --test-coverage-functions=90 \"test/*.test.mjs\"",
+    "lint:scripts": "bash scripts/lib/selfcheck.sh"
+  },
+  "license": "MIT"
+}

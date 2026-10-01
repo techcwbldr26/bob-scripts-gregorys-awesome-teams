@@ -1,0 +1,223 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # The gate students are told about: tests plus 90% coverage.
+  test:
+    name: Tests (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Node 20 is the installer's floor; 24 is what Bob Shell requires.
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: ['20', '24']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Show versions
+        run: |
+          node --version
+          npm --version
+
+      - name: Run tests with the coverage gate
+        run: npm run test:coverage
+
+  shell:
+    name: Shell lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: bash -n, shellcheck, exec bits, secret scan
+        run: npm run lint:scripts
+
+  powershell:
+    name: PowerShell lint
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse the Windows installer
+        shell: pwsh
+        run: |
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path ./scripts/install-windows.ps1),
+            [ref] $null,
+            [ref] $errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Host "::error::$($_.Message)" }
+            exit 1
+          }
+          Write-Host "install-windows.ps1 parses cleanly."
+
+      - name: PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser -ErrorAction Stop
+          $results = Invoke-ScriptAnalyzer -Path ./scripts/install-windows.ps1 -Severity Error,Warning
+          if ($results) {
+            $results | Format-Table -AutoSize | Out-String | Write-Host
+            Write-Host "::error::PSScriptAnalyzer reported problems."
+            exit 1
+          }
+          Write-Host "PSScriptAnalyzer found nothing."
+
+  # Proves the thing students actually run works on each platform, from a clean
+  # checkout, including that re-running it is idempotent.
+  smoke:
+    name: Install smoke test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Run the platform setup script (POSIX)
+        if: runner.os != 'Windows'
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/demo-project"
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            if [ "$(uname -m)" = "arm64" ]; then
+              script=./scripts/install-macos-apple-silicon.sh
+            else
+              script=./scripts/install-macos-intel.sh
+            fi
+          else
+            script=./scripts/install-linux.sh
+          fi
+          echo "Using $script"
+          "$script" --target "$RUNNER_TEMP/demo-project"
+          "$script" --target "$RUNNER_TEMP/demo-project" --verify
+
+      - name: Re-run to prove it is idempotent (POSIX)
+        if: runner.os != 'Windows'
+        run: |
+          set -euo pipefail
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            if [ "$(uname -m)" = "arm64" ]; then
+              script=./scripts/install-macos-apple-silicon.sh
+            else
+              script=./scripts/install-macos-intel.sh
+            fi
+          else
+            script=./scripts/install-linux.sh
+          fi
+          output="$("$script" --target "$RUNNER_TEMP/demo-project")"
+          echo "$output"
+          echo "$output" | grep -q "already current" \
+            || { echo "::error::A second run was not a no-op"; exit 1; }
+
+      - name: Run the Windows setup script
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $project = Join-Path $env:RUNNER_TEMP 'demo-project'
+          New-Item -ItemType Directory -Path $project -Force | Out-Null
+          ./scripts/install-windows.ps1 -Target $project
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/install-windows.ps1 -Target $project -Verify
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Re-run to prove it is idempotent (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $project = Join-Path $env:RUNNER_TEMP 'demo-project'
+          $output = ./scripts/install-windows.ps1 -Target $project | Out-String
+          Write-Host $output
+          if ($output -notmatch 'already current') {
+            Write-Host "::error::A second run was not a no-op"
+            exit 1
+          }
+
+      - name: Show what was installed
+        if: runner.os != 'Windows'
+        run: |
+          cd "$RUNNER_TEMP/demo-project"
+          echo "--- tree ---"
+          find . -type f | sort
+          echo "--- .bob/mcp.json ---"
+          cat .bob/mcp.json
+
+  # A payload that fails its own validation would install skills Bob silently
+  # ignores, so this is checked on its own rather than only inside the suite.
+  payload:
+    name: Payload validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate skills, tokens and the install plan
+        run: |
+          node --input-type=module -e "
+          import { buildPlan } from './src/payload.mjs';
+          const plan = await buildPlan();
+          let failed = false;
+          if (plan.problems.length) {
+            for (const p of plan.problems) console.log('::error::skill problem: ' + p);
+            failed = true;
+          }
+          if (plan.unknownTokens.length) {
+            for (const t of plan.unknownTokens) console.log('::error::unknown token {{' + t + '}}');
+            failed = true;
+          }
+          for (const e of plan.entries) {
+            if (/\{\{[A-Z0-9_]+\}\}/.test(e.contents)) {
+              console.log('::error::unrendered token in ' + e.to);
+              failed = true;
+            }
+          }
+          console.log(plan.entries.length + ' files, ' + plan.skills.length + ' skills');
+          for (const s of plan.skills) console.log('  \$' + s.name);
+          if (failed) process.exit(1);
+          "
+
+  all-green:
+    name: All checks green
+    runs-on: ubuntu-latest
+    needs: [test, shell, powershell, smoke, payload]
+    if: always()
+    steps:
+      - name: Fail if any dependency failed
+        run: |
+          if [ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" = "true" ]; then
+            echo "::error::One or more checks failed."
+            exit 1
+          fi
+          echo "All checks passed."

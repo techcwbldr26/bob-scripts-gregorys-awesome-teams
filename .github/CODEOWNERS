@@ -1,0 +1,7 @@
+# Default reviewer for everything.
+*       @techcwbldr26
+
+# The payload is what Bob actually loads, so it gets the same review attention
+# as the code that installs it.
+/payload/    @techcwbldr26
+/scripts/    @techcwbldr26
