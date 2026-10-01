@@ -12,6 +12,10 @@
 > it will set your project up for you — checking Node, installing the kit and
 > walking you through the free Firecrawl key. About ten minutes, most of it
 > waiting.
+>
+> Then read **[the handbook](https://github.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/wiki)**:
+> the six-stage build flow, a plain-English glossary, and what to do about
+> December 1st.
 
 
 Setup scripts that turn a plain project directory into one the **IBM Bob**

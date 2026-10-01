@@ -8,6 +8,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A fifteen-page student handbook** in `wiki/`, published to the repository's
+  GitHub wiki. Setup, the six-stage build flow, the three engineering
+  disciplines, Firecrawl, testing and evals, demo day, troubleshooting, an FAQ,
+  and a glossary that defines every term in plain English for students who have
+  never used an LLM.
+- **`docs/publishing-the-wiki.md`** — the four commands that copy `wiki/` into
+  GitHub's separate wiki repository, and why that step is a human one.
+- Tests that validate the handbook against the kit: every internal link and
+  heading anchor resolves, every page is reachable from the sidebar, and the
+  skill names, context numbers and coverage gate it quotes match the payload.
+
+### Added
+
 - **`START-HERE.md`** — a single prompt a student pastes into Bob to set up their
   whole project. It is written for someone who may never have used an AI
   assistant or a terminal: Bob checks the machine, installs Node if needed
