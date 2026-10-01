@@ -146,6 +146,31 @@ Linux, it probably belongs in `scripts/lib/common.sh` rather than in each script
 Test by running the script for your own platform against a scratch directory,
 and confirm the wrong-platform guard still refuses correctly.
 
+## Changing the README banner
+
+`assets/banner.svg` is generated. Edit `tools/build-banner.mjs`, then:
+
+```bash
+npm run build:banner
+npm test                 # a test fails if the committed SVG drifts
+```
+
+Do not hand-edit the SVG: it is a single 24-second CSS timeline, every element's
+keyframes are percentages of that cycle, and the token gauge tracks a running
+total. The generator does that arithmetic.
+
+Two things are easy to get wrong and are covered by tests:
+
+- **Every animated element needs a reduced-motion state.** Turning the animation
+  off is not enough — all three acts would then render stacked on top of each
+  other. Each helper in the generator pushes a rule describing the still frame.
+- **Counts come from the payload.** The number of skills, the number of rules and
+  the coverage gate are read at build time rather than typed, so they cannot go
+  stale when someone adds a tenth skill.
+
+To check it visually, open the SVG in a browser; to inspect one moment, pause the
+animations and set `currentTime` through `document.getAnimations()`.
+
 ## Secrets
 
 Never commit an API key, and never write one into a payload file. The key is
