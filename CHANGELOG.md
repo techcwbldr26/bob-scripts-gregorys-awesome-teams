@@ -8,6 +8,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **`START-HERE.md`** — a single prompt a student pastes into Bob to set up their
+  whole project. It is written for someone who may never have used an AI
+  assistant or a terminal: Bob checks the machine, installs Node if needed
+  (asking first), fetches the kit into a cache folder rather than the student's
+  project, runs the right platform script, puts `.env` out of git *before*
+  asking for the key, and verifies. Linked from the top of the README.
+- The prompt validates the Firecrawl key **without reading `.env`**, using a
+  `grep -q` that answers present or missing and shows nothing else, so the key
+  never enters the model's context. Storing it stays a command the student types.
+
+### Added
+
 - **An animated README banner** (`assets/banner.svg`). It animates the course's
   context-window diagram in three acts: a session filling the window past the
   190k compaction threshold, compaction collapsing the older turns into one

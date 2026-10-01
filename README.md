@@ -6,6 +6,14 @@
 
 # Gregory's Awesome Teams
 
+> ### Never used an AI assistant before?
+>
+> **[Start here](START-HERE.md).** Copy one block of text, paste it into Bob, and
+> it will set your project up for you — checking Node, installing the kit and
+> walking you through the free Firecrawl key. About ten minutes, most of it
+> waiting.
+
+
 Setup scripts that turn a plain project directory into one the **IBM Bob**
 harness already knows how to work in — so a university team can point Bob at
 their product idea and get useful work instead of confident guesses.
