@@ -224,10 +224,16 @@ if ($Force)  { $arguments += '--force' }
 if ($DryRun) { $arguments += '--dry-run' }
 if ($Verify) { $arguments = @((Join-Path $kit 'src/cli.mjs'), '--target', $Target, '--verify') }
 
-# Drain node's output through the pipeline before exiting. Calling `exit`
-# straight after a native command can discard output that has not been flushed,
-# which is why neither run's installer report reached CI. node's stderr is left
-# alone so it goes straight to the console and stays out of captured stdout.
-& node @arguments | ForEach-Object { Write-Output $_ }
+# Collect node's output, then relay it on the information stream.
+#
+# Writing it to the output stream and then calling `exit` loses it: PowerShell
+# had not flushed the pipeline before the process went away, so the installer's
+# report reached neither the console nor CI, while node's stderr -- which goes
+# straight to the console -- came through fine. The information stream flushes
+# as it is written, which is why every other message in this script uses it.
+#
+# Capture first so $LASTEXITCODE is read before anything else can reset it.
+$installerOutput = & node @arguments
 $installerExitCode = $LASTEXITCODE
+foreach ($line in $installerOutput) { Write-Information $line }
 exit $installerExitCode

@@ -179,10 +179,21 @@ describe('install-windows.ps1', () => {
     assert.match(await ps(), /exit \$installerExitCode/);
   });
 
-  it('drains node output through the pipeline, so it is not lost before exit', async () => {
-    // Calling `exit` straight after a native command discarded the installer's
-    // report on Windows. CI reads that output to check idempotence.
-    assert.match(await ps(), /& node @arguments \| ForEach-Object/);
+  it('relays node output on the information stream, which survives exit', async () => {
+    // Writing it to the output stream and then calling `exit` lost it on
+    // Windows: PowerShell had not flushed the pipeline before the process went
+    // away, so the installer's report reached neither the console nor CI.
+    const source = await ps();
+    assert.match(source, /\$installerOutput = & node @arguments/);
+    assert.match(source, /foreach \(\$line in \$installerOutput\) \{ Write-Information \$line \}/);
+  });
+
+  it('reads the exit code before relaying output, so nothing can reset it', async () => {
+    const source = await ps();
+    const captureAt = source.indexOf('$installerOutput = & node @arguments');
+    const exitCodeAt = source.indexOf('$installerExitCode = $LASTEXITCODE');
+    const relayAt = source.indexOf('foreach ($line in $installerOutput)');
+    assert.ok(captureAt > 0 && exitCodeAt > captureAt && relayAt > exitCodeAt);
   });
 
   it('keeps a non-zero node exit readable rather than terminating', async () => {
@@ -212,15 +223,13 @@ describe('install-windows.ps1', () => {
     }
   });
 
-  it('keeps Write-Output out of every function, so return values stay clean', async () => {
-    // In PowerShell anything a function writes to the output stream becomes
-    // part of its return value. A progress message inside Resolve-KitDirectory
-    // once made it return [message, path], and the caller used the message as
-    // a directory. Only the top-level node call may write to that stream.
+  it('never writes to the output stream at all', async () => {
+    // Two separate failures came from that stream: in PowerShell anything a
+    // function writes to it becomes part of its return value (which made
+    // Resolve-KitDirectory return [message, path]), and writes to it were lost
+    // when the script called exit. Nothing in this script needs it.
     const lines = await callSites();
-    const writeOutput = lines.filter((line) => line.includes('Write-Output'));
-    assert.equal(writeOutput.length, 1, `expected one Write-Output, got:\n${writeOutput.join('\n')}`);
-    assert.match(writeOutput[0], /& node @arguments/);
+    assert.deepEqual(lines.filter((line) => line.includes('Write-Output')), []);
   });
 
   it('declares Resolve-KitDirectory as returning a single string', async () => {

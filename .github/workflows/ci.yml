@@ -172,21 +172,65 @@ jobs:
         shell: pwsh
         run: |
           $project = Join-Path $env:RUNNER_TEMP 'demo-project'
-          $output = ./scripts/install-windows.ps1 -Target $project | Out-String
-          Write-Host $output
+          # *>&1 so the installer's report is captured wherever the script put
+          # it. It relays node's output on the information stream, because
+          # output-stream writes were being lost on exit.
+          $output = ./scripts/install-windows.ps1 -Target $project *>&1 | Out-String
+          Write-Output $output
           if ($output -notmatch 'already current') {
-            Write-Host "::error::A second run was not a no-op"
+            Write-Output "::error::A second run was not a no-op"
             exit 1
           }
 
-      - name: Show what was installed
+      - name: Show what was installed (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $project = Join-Path $env:RUNNER_TEMP 'demo-project'
+          Get-ChildItem -Path $project -Recurse -File |
+            ForEach-Object { $_.FullName.Substring($project.Length + 1) } |
+            Sort-Object |
+            ForEach-Object { Write-Output $_ }
+          Write-Output "--- .bob/mcp.json ---"
+          Get-Content (Join-Path $project '.bob/mcp.json') | ForEach-Object { Write-Output $_ }
+
+          # An installer whose output vanished once already passed CI while
+          # doing nothing visible. Assert the files are really there.
+          $required = @(
+            'AGENTS.md',
+            'SKILLS.md',
+            '.bob/mcp.json',
+            '.bob/commands/gregorys-awesome-teams.md',
+            '.bob/skills/wizard/SKILL.md',
+            '.bob/rules/00-evidence-over-memory.md',
+            'examples/wizard-template.sh',
+            'references/firecrawl-playbook.md'
+          )
+          $missing = $required | Where-Object { -not (Test-Path (Join-Path $project $_)) }
+          if ($missing) {
+            $missing | ForEach-Object { Write-Output "::error::missing $_" }
+            exit 1
+          }
+          Write-Output "All required files present."
+
+      - name: Show what was installed (POSIX)
         if: runner.os != 'Windows'
         run: |
+          set -euo pipefail
           cd "$RUNNER_TEMP/demo-project"
           echo "--- tree ---"
           find . -type f | sort
           echo "--- .bob/mcp.json ---"
           cat .bob/mcp.json
+          for f in AGENTS.md SKILLS.md .bob/mcp.json \
+                   .bob/commands/gregorys-awesome-teams.md \
+                   .bob/skills/wizard/SKILL.md \
+                   .bob/rules/00-evidence-over-memory.md \
+                   examples/wizard-template.sh \
+                   references/firecrawl-playbook.md; do
+            [ -f "$f" ] || { echo "::error::missing $f"; exit 1; }
+          done
+          echo "All required files present."
 
   # A payload that fails its own validation would install skills Bob silently
   # ignores, so this is checked on its own rather than only inside the suite.
