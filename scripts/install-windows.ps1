@@ -46,6 +46,16 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+# Progress messages go to the information stream so they are displayed without
+# becoming part of any function's return value. See the note on the Write-*
+# helpers below for why that distinction matters here.
+$InformationPreference = 'Continue'
+# Keep a non-zero exit from node readable as $LASTEXITCODE instead of a
+# terminating error. The default for this has moved between PowerShell
+# versions, and Windows PowerShell 5.1 does not have it at all.
+if (Get-Variable PSNativeCommandUseErrorActionPreference -ErrorAction SilentlyContinue) {
+    $PSNativeCommandUseErrorActionPreference = $false
+}
 
 $script:RepoUrl = if ($env:GAT_REPO_URL) { $env:GAT_REPO_URL } else {
     'https://github.com/techcwbldr26/bob-scripts-gregorys-awesome-teams.git'
@@ -53,14 +63,19 @@ $script:RepoUrl = if ($env:GAT_REPO_URL) { $env:GAT_REPO_URL } else {
 $script:InstallerMinNode = 20
 $script:BobShellMinNode = 24
 
-# Write-Output rather than Write-Host throughout: Write-Host writes to the host
-# and cannot be captured or redirected, so CI could not read this script's
-# output to check that a second run is a no-op. Plain text markers replace
-# colour, matching what the shell scripts print when NO_COLOR is set.
-function Write-Info       { param([string] $Message) Write-Output $Message }
-function Write-Ok         { param([string] $Message) Write-Output "[ok] $Message" }
-function Write-Warn       { param([string] $Message) Write-Output "[!]  $Message" }
-function Write-Problem    { param([string] $Message) Write-Output "[x]  $Message" }
+# Write-Information, not Write-Host and not Write-Output.
+#
+# Write-Host cannot be captured or redirected, so CI could not read this
+# script's output to check that a second run is a no-op. Write-Output is worse:
+# in PowerShell everything a function writes to the output stream becomes part
+# of its return value, so a progress message inside Resolve-KitDirectory made
+# that function return an array of [message, path] and the caller then used the
+# message as a directory. The information stream displays (because
+# $InformationPreference is Continue) while staying out of return values.
+function Write-Info       { param([string] $Message) Write-Information $Message }
+function Write-Ok         { param([string] $Message) Write-Information "[ok] $Message" }
+function Write-Warn       { param([string] $Message) Write-Information "[!]  $Message" }
+function Write-Problem    { param([string] $Message) Write-Information "[x]  $Message" }
 
 function Write-FatalError {
     param([string] $Message)
@@ -69,11 +84,11 @@ function Write-FatalError {
 }
 
 function Show-Header {
-    Write-Output ''
-    Write-Output "Gregory's Awesome Teams"
-    Write-Output 'Prompt, context and harness engineering for the IBM Bob harness'
-    Write-Output 'Target platform: Windows 11'
-    Write-Output ''
+    Write-Information ''
+    Write-Information "Gregory's Awesome Teams"
+    Write-Information 'Prompt, context and harness engineering for the IBM Bob harness'
+    Write-Information 'Target platform: Windows 11'
+    Write-Information ''
 }
 
 # Confirm we are on Windows. PowerShell 7 runs on macOS and Linux too, where the
@@ -117,13 +132,13 @@ function Assert-Node {
     $major = Get-NodeMajorVersion
 
     if ($major -eq 0) {
-        Write-Output ''
+        Write-Information ''
         Write-Problem 'Node.js is required and was not found.'
-        Write-Output ''
+        Write-Information ''
         Write-Info "Bob Shell needs Node $script:BobShellMinNode or later, so install that version:"
         Write-Info '  winget:    winget install OpenJS.NodeJS.LTS'
         Write-Info '  Installer: https://nodejs.org/en/download'
-        Write-Output ''
+        Write-Information ''
         Write-FatalError 'Install Node, open a new PowerShell window, and run this script again.'
     }
 
@@ -141,7 +156,10 @@ function Assert-Node {
 }
 
 # Find the kit: either we are inside a checkout, or fetch one into a cache dir.
+# Returns exactly one string. Nothing in here may write to the output stream,
+# or that value is appended to what the caller receives.
 function Resolve-KitDirectory {
+    [OutputType([string])]
     param([string] $ScriptDirectory)
 
     $candidate = Split-Path -Parent $ScriptDirectory
@@ -208,7 +226,8 @@ if ($Verify) { $arguments = @((Join-Path $kit 'src/cli.mjs'), '--target', $Targe
 
 # Drain node's output through the pipeline before exiting. Calling `exit`
 # straight after a native command can discard output that has not been flushed,
-# which is why neither run's installer report reached CI.
-& node @arguments 2>&1 | ForEach-Object { Write-Output $_ }
+# which is why neither run's installer report reached CI. node's stderr is left
+# alone so it goes straight to the console and stays out of captured stdout.
+& node @arguments | ForEach-Object { Write-Output $_ }
 $installerExitCode = $LASTEXITCODE
 exit $installerExitCode

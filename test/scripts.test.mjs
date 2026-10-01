@@ -182,17 +182,49 @@ describe('install-windows.ps1', () => {
   it('drains node output through the pipeline, so it is not lost before exit', async () => {
     // Calling `exit` straight after a native command discarded the installer's
     // report on Windows. CI reads that output to check idempotence.
-    assert.match(await ps(), /& node @arguments 2>&1 \| ForEach-Object/);
+    assert.match(await ps(), /& node @arguments \| ForEach-Object/);
   });
 
-  it('uses Write-Output, not Write-Host, so its output can be captured', async () => {
+  it('keeps a non-zero node exit readable rather than terminating', async () => {
+    assert.match(await ps(), /PSNativeCommandUseErrorActionPreference = \$false/);
+  });
+
+  /** Non-comment lines of the script, for call-site assertions. */
+  const callSites = async () =>
+    (await ps()).split('\n').filter((line) => !line.trimStart().startsWith('#'));
+
+  it('never calls Write-Host, whose output cannot be captured', async () => {
+    assert.deepEqual(
+      (await callSites()).filter((line) => line.includes('Write-Host')),
+      [],
+    );
+  });
+
+  it('writes progress to the information stream, not the output stream', async () => {
     const source = await ps();
-    // The explanatory comment is allowed to name it; no call sites may.
-    const callSites = source
-      .split('\n')
-      .filter((line) => !line.trimStart().startsWith('#'))
-      .filter((line) => line.includes('Write-Host'));
-    assert.deepEqual(callSites, []);
+    assert.match(source, /\$InformationPreference = 'Continue'/);
+    for (const helper of ['Write-Info', 'Write-Ok', 'Write-Warn', 'Write-Problem']) {
+      assert.match(
+        source,
+        new RegExp(`function ${helper}\\s*\\{[^}]*Write-Information`),
+        `${helper} must use Write-Information`,
+      );
+    }
+  });
+
+  it('keeps Write-Output out of every function, so return values stay clean', async () => {
+    // In PowerShell anything a function writes to the output stream becomes
+    // part of its return value. A progress message inside Resolve-KitDirectory
+    // once made it return [message, path], and the caller used the message as
+    // a directory. Only the top-level node call may write to that stream.
+    const lines = await callSites();
+    const writeOutput = lines.filter((line) => line.includes('Write-Output'));
+    assert.equal(writeOutput.length, 1, `expected one Write-Output, got:\n${writeOutput.join('\n')}`);
+    assert.match(writeOutput[0], /& node @arguments/);
+  });
+
+  it('declares Resolve-KitDirectory as returning a single string', async () => {
+    assert.match(await ps(), /function Resolve-KitDirectory \{\s*\r?\n\s*\[OutputType\(\[string\]\)\]/);
   });
 
   it('has balanced braces, parentheses and brackets', async () => {

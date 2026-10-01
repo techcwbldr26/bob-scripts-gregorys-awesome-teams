@@ -127,6 +127,14 @@ Linux, it probably belongs in `scripts/lib/common.sh` rather than in each script
 
 - `shellcheck` must be clean at `--severity=warning`.
 - PowerShell must parse and pass PSScriptAnalyzer at Error and Warning level.
+- In `install-windows.ps1`, progress messages use `Write-Information`, never
+  `Write-Output` or `Write-Host`. Anything a PowerShell function writes to the
+  output stream becomes part of its **return value**: a progress message inside
+  `Resolve-KitDirectory` once made it return `[message, path]`, and the caller
+  used the message as a directory. Only the top-level `node` call may write to
+  the output stream, and a test enforces that.
+- Shell scripts must stay LF. `.gitattributes` pins them, because a CRLF
+  checkout breaks the shebang.
 - Nothing destructive runs without a typed confirmation.
 - A failure must say what to do next. "Error: failed" helps nobody.
 
