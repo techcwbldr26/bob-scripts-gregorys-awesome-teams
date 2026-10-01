@@ -105,7 +105,8 @@ jobs:
           Write-Host "PSScriptAnalyzer found nothing."
 
   # Proves the thing students actually run works on each platform, from a clean
-  # checkout, including that re-running it is idempotent.
+  # checkout. The file assertions come straight after the install, because an
+  # installer that silently did nothing once passed this job three times.
   smoke:
     name: Install smoke test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -120,43 +121,30 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Run the platform setup script (POSIX)
+      - name: Pick this platform's script
+        if: runner.os != 'Windows'
+        run: |
+          set -euo pipefail
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            if [ "$(uname -m)" = "arm64" ]; then
+              script=./scripts/install-macos-apple-silicon.sh
+            else
+              script=./scripts/install-macos-intel.sh
+            fi
+          else
+            script=./scripts/install-linux.sh
+          fi
+          echo "GAT_SCRIPT=$script" >> "$GITHUB_ENV"
+          echo "Using $script"
+
+      - name: Install (POSIX)
         if: runner.os != 'Windows'
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/demo-project"
-          if [ "$RUNNER_OS" = "macOS" ]; then
-            if [ "$(uname -m)" = "arm64" ]; then
-              script=./scripts/install-macos-apple-silicon.sh
-            else
-              script=./scripts/install-macos-intel.sh
-            fi
-          else
-            script=./scripts/install-linux.sh
-          fi
-          echo "Using $script"
-          "$script" --target "$RUNNER_TEMP/demo-project"
-          "$script" --target "$RUNNER_TEMP/demo-project" --verify
+          "$GAT_SCRIPT" --target "$RUNNER_TEMP/demo-project"
 
-      - name: Re-run to prove it is idempotent (POSIX)
-        if: runner.os != 'Windows'
-        run: |
-          set -euo pipefail
-          if [ "$RUNNER_OS" = "macOS" ]; then
-            if [ "$(uname -m)" = "arm64" ]; then
-              script=./scripts/install-macos-apple-silicon.sh
-            else
-              script=./scripts/install-macos-intel.sh
-            fi
-          else
-            script=./scripts/install-linux.sh
-          fi
-          output="$("$script" --target "$RUNNER_TEMP/demo-project")"
-          echo "$output"
-          echo "$output" | grep -q "already current" \
-            || { echo "::error::A second run was not a no-op"; exit 1; }
-
-      - name: Run the Windows setup script
+      - name: Install (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
@@ -164,56 +152,10 @@ jobs:
           New-Item -ItemType Directory -Path $project -Force | Out-Null
           ./scripts/install-windows.ps1 -Target $project
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          ./scripts/install-windows.ps1 -Target $project -Verify
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Re-run to prove it is idempotent (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $project = Join-Path $env:RUNNER_TEMP 'demo-project'
-          # *>&1 so the installer's report is captured wherever the script put
-          # it. It relays node's output on the information stream, because
-          # output-stream writes were being lost on exit.
-          $output = ./scripts/install-windows.ps1 -Target $project *>&1 | Out-String
-          Write-Output $output
-          if ($output -notmatch 'already current') {
-            Write-Output "::error::A second run was not a no-op"
-            exit 1
-          }
-
-      - name: Show what was installed (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $project = Join-Path $env:RUNNER_TEMP 'demo-project'
-          Get-ChildItem -Path $project -Recurse -File |
-            ForEach-Object { $_.FullName.Substring($project.Length + 1) } |
-            Sort-Object |
-            ForEach-Object { Write-Output $_ }
-          Write-Output "--- .bob/mcp.json ---"
-          Get-Content (Join-Path $project '.bob/mcp.json') | ForEach-Object { Write-Output $_ }
-
-          # An installer whose output vanished once already passed CI while
-          # doing nothing visible. Assert the files are really there.
-          $required = @(
-            'AGENTS.md',
-            'SKILLS.md',
-            '.bob/mcp.json',
-            '.bob/commands/gregorys-awesome-teams.md',
-            '.bob/skills/wizard/SKILL.md',
-            '.bob/rules/00-evidence-over-memory.md',
-            'examples/wizard-template.sh',
-            'references/firecrawl-playbook.md'
-          )
-          $missing = $required | Where-Object { -not (Test-Path (Join-Path $project $_)) }
-          if ($missing) {
-            $missing | ForEach-Object { Write-Output "::error::missing $_" }
-            exit 1
-          }
-          Write-Output "All required files present."
-
-      - name: Show what was installed (POSIX)
+      # This is the check that catches an install which reported success and
+      # wrote nothing. It runs before anything else looks at the result.
+      - name: Assert the files actually landed (POSIX)
         if: runner.os != 'Windows'
         run: |
           set -euo pipefail
@@ -230,7 +172,76 @@ jobs:
                    references/firecrawl-playbook.md; do
             [ -f "$f" ] || { echo "::error::missing $f"; exit 1; }
           done
-          echo "All required files present."
+          count=$(find . -type f | wc -l)
+          [ "$count" -ge 30 ] || { echo "::error::only $count files installed"; exit 1; }
+          echo "All required files present ($count total)."
+
+      - name: Assert the files actually landed (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $project = Join-Path $env:RUNNER_TEMP 'demo-project'
+          $files = Get-ChildItem -Path $project -Recurse -File
+          $files | ForEach-Object { Write-Output $_.FullName.Substring($project.Length + 1) } | Sort-Object
+          Write-Output "--- .bob/mcp.json ---"
+          Get-Content (Join-Path $project '.bob/mcp.json') -ErrorAction SilentlyContinue |
+            ForEach-Object { Write-Output $_ }
+
+          $required = @(
+            'AGENTS.md',
+            'SKILLS.md',
+            '.bob/mcp.json',
+            '.bob/commands/gregorys-awesome-teams.md',
+            '.bob/skills/wizard/SKILL.md',
+            '.bob/rules/00-evidence-over-memory.md',
+            'examples/wizard-template.sh',
+            'references/firecrawl-playbook.md'
+          )
+          $missing = $required | Where-Object { -not (Test-Path (Join-Path $project $_)) }
+          if ($missing) {
+            $missing | ForEach-Object { Write-Output "::error::missing $_" }
+            exit 1
+          }
+          if ($files.Count -lt 30) {
+            Write-Output "::error::only $($files.Count) files installed"
+            exit 1
+          }
+          Write-Output "All required files present ($($files.Count) total)."
+
+      - name: Verify (POSIX)
+        if: runner.os != 'Windows'
+        run: '"$GAT_SCRIPT" --target "$RUNNER_TEMP/demo-project" --verify'
+
+      - name: Verify (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $project = Join-Path $env:RUNNER_TEMP 'demo-project'
+          ./scripts/install-windows.ps1 -Target $project -Verify
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Re-run to prove it is idempotent (POSIX)
+        if: runner.os != 'Windows'
+        run: |
+          set -euo pipefail
+          output="$("$GAT_SCRIPT" --target "$RUNNER_TEMP/demo-project")"
+          echo "$output"
+          echo "$output" | grep -q "already current" \
+            || { echo "::error::A second run was not a no-op"; exit 1; }
+
+      - name: Re-run to prove it is idempotent (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $project = Join-Path $env:RUNNER_TEMP 'demo-project'
+          # *>&1 because the script relays node's output on the information
+          # stream: output-stream writes were being lost when it called exit.
+          $output = ./scripts/install-windows.ps1 -Target $project *>&1 | Out-String
+          Write-Output $output
+          if ($output -notmatch 'already current') {
+            Write-Output "::error::A second run was not a no-op"
+            exit 1
+          }
 
   # A payload that fails its own validation would install skills Bob silently
   # ignores, so this is checked on its own rather than only inside the suite.

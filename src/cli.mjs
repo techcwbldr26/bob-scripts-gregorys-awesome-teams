@@ -5,6 +5,7 @@
  */
 
 import process from 'node:process';
+import { pathToFileURL } from 'node:url';
 
 import {
   COMMAND_NAME,
@@ -203,8 +204,30 @@ export async function main(argv = [], io = console, env = {}) {
   return result.ok ? 0 : 1;
 }
 
+/**
+ * Was this module run directly, rather than imported?
+ *
+ * The obvious form, `import.meta.url === \`file://${process.argv[1]}\``, is
+ * broken on Windows and silently so: `process.argv[1]` is `D:\\a\\src\\cli.mjs`,
+ * which concatenates to `file://D:\\a\\src\\cli.mjs`, while `import.meta.url` is
+ * `file:///D:/a/src/cli.mjs`. They never match, so the CLI did nothing at all
+ * on Windows and exited 0 -- an installer that silently installed nothing.
+ * `pathToFileURL` handles the drive letter and separators properly.
+ *
+ * @param {string} metaUrl `import.meta.url` of the module
+ * @param {string|undefined} argv1 `process.argv[1]`
+ */
+export function isMainModule(metaUrl, argv1) {
+  if (typeof argv1 !== 'string' || argv1 === '') return false;
+  try {
+    return metaUrl === pathToFileURL(argv1).href;
+  } catch {
+    return false;
+  }
+}
+
 // Only run when invoked directly, never when imported by a test.
-if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url, process.argv[1])) {
   main(process.argv.slice(2))
     .then((code) => process.exit(code))
     .catch((error) => {

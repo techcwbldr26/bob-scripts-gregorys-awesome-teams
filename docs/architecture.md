@@ -150,7 +150,7 @@ script and the student runs it, so a captured key goes from terminal to `.env` o
 Node's own runner and coverage reporter; no npm dependencies. A teaching repo
 that needs a toolchain installed before its tests run teaches the wrong lesson.
 
-- 238 tests, gate at 90% lines, branches and functions. The gate needs Node 22
+- 243 tests, gate at 90% lines, branches and functions. The gate needs Node 22
   or later, so the Node 20 matrix leg runs the suite without it.
 - Every test is hermetic: `tempDir()` per test, no network, no writes outside
   temp, nothing that depends on the developer's machine.
@@ -160,9 +160,19 @@ that needs a toolchain installed before its tests run teaches the wrong lesson.
   injectable `io` and Node version. That is what makes the CLI, including the
   old-Node guard, testable without spawning processes.
 
-The one deliberate gap is the `import.meta.url === process.argv[1]`
-direct-invocation block in `cli.mjs`, which by design never executes under the
-test runner.
+The direct-invocation block in `cli.mjs` is the one part the runner never
+executes. That gap used to be bigger, and it hid a real bug: the guard was
+`import.meta.url === \`file://${process.argv[1]}\``, which is false on Windows
+for every path, because `process.argv[1]` there is `D:\\a\\src\\cli.mjs` while
+`import.meta.url` is `file:///D:/a/src/cli.mjs`. The CLI did nothing on Windows
+and exited 0 — an installer that silently installed nothing, and CI passed it
+three times. The comparison now lives in an exported `isMainModule()` built on
+`pathToFileURL`, which is unit tested; only the two lines that call `main()`
+remain uncovered.
+
+The lesson generalised into CI: the smoke job now asserts that the install
+produced specific files, immediately after installing, on every platform. An
+install that reports success and writes nothing fails there.
 
 ## CI
 

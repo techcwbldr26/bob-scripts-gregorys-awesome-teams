@@ -1,7 +1,16 @@
 import assert from 'node:assert/strict';
 import { after, describe, it } from 'node:test';
 
-import { formatReport, formatVerify, helpText, main, parseArgs } from '../src/cli.mjs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+import {
+  formatReport,
+  formatVerify,
+  helpText,
+  isMainModule,
+  main,
+  parseArgs,
+} from '../src/cli.mjs';
 import { BOB_PATHS } from '../src/constants.mjs';
 import { captureIo, cleanup, exists, tempDir, write } from './helpers.mjs';
 
@@ -251,5 +260,41 @@ describe('main’s Node version guard', () => {
   it('falls back to the running Node when no version is injected', async () => {
     const { io } = captureIo();
     assert.equal(await main(['--help'], io), 0);
+  });
+});
+
+describe('isMainModule', () => {
+  it('matches when argv[1] is the module s own path', () => {
+    const here = fileURLToPath(new URL('../src/cli.mjs', import.meta.url));
+    assert.equal(isMainModule(pathToFileURL(here).href, here), true);
+  });
+
+  it('does not match a different file', () => {
+    const here = fileURLToPath(new URL('../src/cli.mjs', import.meta.url));
+    const other = fileURLToPath(new URL('../src/install.mjs', import.meta.url));
+    assert.equal(isMainModule(pathToFileURL(other).href, here), false);
+  });
+
+  it('returns false when argv[1] is missing or not a string', () => {
+    for (const argv1 of [undefined, null, '', 42, {}]) {
+      assert.equal(isMainModule('file:///x.mjs', argv1), false, String(argv1));
+    }
+  });
+
+  it('rejects the naive template-string comparison that broke Windows', () => {
+    // A Windows argv[1]. The old guard built `file://D:\a\src\cli.mjs`, which
+    // never equals the real `file:///D:/a/src/cli.mjs`, so main() never ran.
+    const windowsArgv = 'D:\\a\\project\\src\\cli.mjs';
+    const realMetaUrl = 'file:///D:/a/project/src/cli.mjs';
+    assert.notEqual(`file://${windowsArgv}`, realMetaUrl);
+    // pathToFileURL is platform-specific, so assert the property that matters
+    // everywhere: the naive form is not what this function computes.
+    assert.notEqual(isMainModule(`file://${windowsArgv}`, windowsArgv), true);
+  });
+
+  it('round-trips any path on this platform', () => {
+    for (const p of [process.cwd(), fileURLToPath(import.meta.url)]) {
+      assert.equal(isMainModule(pathToFileURL(p).href, p), true, p);
+    }
   });
 });
