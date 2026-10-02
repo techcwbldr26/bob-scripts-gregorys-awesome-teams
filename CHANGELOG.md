@@ -23,8 +23,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     argument, so students understand that accuracy degrades well before the
     window fills — the single most load-bearing fact on the page and previously
     absent. Adds Anthropic's "smallest possible set of high-signal tokens"
-    principle and LangChain's write / select / compress / isolate framework,
-    each mapped to something in the project.
+    principle and their four techniques — just-in-time retrieval, structured
+    note-taking, compaction and sub-agents — each mapped to something that
+    already exists in the project.
   - **Prompt Engineering** now opens on Anthropic's "brilliant but new
     employee" test, then sets the three labs' published guidance side by side —
     both where it converges and where it flatly contradicts itself. OpenAI tell

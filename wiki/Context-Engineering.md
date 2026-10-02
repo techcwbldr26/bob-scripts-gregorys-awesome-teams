@@ -13,9 +13,9 @@ managing **everything in the window** — system prompt, rules, skills, tool
 definitions, files you read, tool results, and the whole message history —
 across a session that may run for hours.
 
-Cognition's line, quoted by LangChain, is not an exaggeration: context
-engineering *"is effectively the #1 job of engineers building AI agents."*
-(LangChain, [Context Engineering](https://www.langchain.com/blog/context-engineering-for-agents), 2 July 2025.)
+It is also the one that gets blamed on the model. "Bob forgot what we agreed"
+and "Bob got worse after lunch" are almost never model problems. They are
+context problems, and they are yours to fix.
 
 ---
 
@@ -65,32 +65,21 @@ signal per token, not minimising tokens.
 
 ---
 
-## The four moves
+## The four techniques
 
-LangChain groups every context technique into four categories ([Context Engineering](https://www.langchain.com/blog/context-engineering-for-agents)).
-Each one has a concrete form in your project:
+Anthropic name four. Every one already has a concrete form in your project —
+none of them needs a library, and all of them are things you do by hand:
 
-| Move | What it means | What you actually do |
+| Technique | What it means | What you actually do |
 | --- | --- | --- |
-| **Write** | save context *outside* the window | `TASKS.md`, `GLOSSARY.md`, `references/evidence.md`, ADRs |
-| **Select** | pull in only what this task needs | read a line range, not a file; one skill, not nine |
-| **Compress** | keep only the tokens the task requires | summarise before `/clear`; let compaction run on your terms |
-| **Isolate** | split context so pieces stay clean | a subagent for a wide search; a fresh session per stage |
+| **Just-in-time retrieval** | keep lightweight identifiers — paths, URLs, IDs — and load the content at the moment you need it, rather than pre-loading everything up front | read a line range, not a whole file; `$discover-with-firecrawl` stores URLs and dates, not pasted pages |
+| **Structured note-taking** | the agent writes notes to a file outside the window and pulls them back in later | `TASKS.md`, `GLOSSARY.md`, `references/evidence.md`, ADRs |
+| **Compaction** | summarise a conversation near the limit and restart from the summary | Bob does this at ~190k whether you planned it or not — better to do it deliberately, earlier, on your terms |
+| **Sub-agents** | a specialist works in a clean window and hands back a condensed summary | a subagent for a wide search, so the exploration never enters your main context |
 
-Anthropic names the same moves as techniques, and the mapping is direct:
-
-- **Just-in-time retrieval** — hold lightweight identifiers (file paths, URLs,
-  IDs) and load the content at the moment you need it, instead of pre-loading
-  everything up front. This is *select*, and it is what `$discover-with-firecrawl`
-  is doing when it stores URLs rather than pasted pages.
-- **Compaction** — summarise a conversation near the limit and restart from the
-  summary. Bob does this for you at ~190k, which is *compress* happening whether
-  you planned it or not.
-- **Structured note-taking** — the agent writes notes to a file outside the
-  window and pulls them back later. That is `TASKS.md`. It is the single
-  cheapest habit on this page, and it is *write*.
-- **Sub-agents** — a specialist works in a clean window and returns a condensed
-  summary, so the exploration never enters your main context. That is *isolate*.
+Of the four, **structured note-taking is the cheapest and the one students
+skip.** A decision written to a file survives compaction. The same decision
+sitting in your scrollback does not.
 
 **The goal is not to survive compaction. It is to never need it.**
 
