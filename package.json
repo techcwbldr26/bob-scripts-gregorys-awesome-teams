@@ -14,6 +14,9 @@
     "install:kit": "node src/cli.mjs",
     "verify": "node src/cli.mjs --verify",
     "build:banner": "node tools/build-banner.mjs",
+    "build:flow": "node tools/build-flow-diagram.mjs",
+    "build:skills": "node tools/build-skills-diagram.mjs",
+    "build:svg": "npm run build:banner && npm run build:flow && npm run build:skills",
     "test": "node --test",
     "test:coverage": "node --test --experimental-test-coverage --test-coverage-exclude=\"test/**\" --test-coverage-exclude=\"scripts/**\" --test-coverage-lines=90 --test-coverage-branches=90 --test-coverage-functions=90",
     "lint:scripts": "bash scripts/lib/selfcheck.sh"

@@ -146,20 +146,28 @@ Linux, it probably belongs in `scripts/lib/common.sh` rather than in each script
 Test by running the script for your own platform against a scratch directory,
 and confirm the wrong-platform guard still refuses correctly.
 
-## Changing the README banner
+## Changing the animated diagrams
 
-`assets/banner.svg` is generated. Edit `tools/build-banner.mjs`, then:
+Three SVGs are generated, and all three share `tools/lib/svg.mjs`:
+
+| File | Generator | Where it appears |
+| --- | --- | --- |
+| `assets/banner.svg` | `tools/build-banner.mjs` | top of the README |
+| `assets/build-flow.svg` | `tools/build-flow-diagram.mjs` | wiki, The Build Flow |
+| `assets/skills.svg` | `tools/build-skills-diagram.mjs` | wiki, Skills Reference |
+
+Edit the generator, then:
 
 ```bash
-npm run build:banner
-npm test                 # a test fails if the committed SVG drifts
+npm run build:svg        # or build:banner / build:flow / build:skills
+npm test                 # a test fails if a committed SVG drifts
 ```
 
-Do not hand-edit the SVG: it is a single 24-second CSS timeline, every element's
-keyframes are percentages of that cycle, and the token gauge tracks a running
-total. The generator does that arithmetic.
+Do not hand-edit an SVG: each one is a single 35-second CSS timeline, every
+element's keyframes are percentages of that cycle, and the readouts track
+running totals measured from `payload/`. The generators do that arithmetic.
 
-Two things are easy to get wrong and are covered by tests:
+Three things are easy to get wrong, and all three are covered by tests:
 
 - **Every animated element needs a reduced-motion state.** Turning the animation
   off is not enough — all three acts would then render stacked on top of each
@@ -167,6 +175,10 @@ Two things are easy to get wrong and are covered by tests:
 - **Counts come from the payload.** The number of skills, the number of rules and
   the coverage gate are read at build time rather than typed, so they cannot go
   stale when someone adds a tenth skill.
+- **A property declared only on a later keyframe does not hold until then.** CSS
+  interpolates it from the element's base value at 0%, so a path that names
+  `opacity` only on its closing stop spends the whole cycle fading out. Declare
+  every animated property on the first stop too.
 
 To check it visually, open the SVG in a browser; to inspect one moment, pause the
 animations and set `currentTime` through `document.getAnimations()`.

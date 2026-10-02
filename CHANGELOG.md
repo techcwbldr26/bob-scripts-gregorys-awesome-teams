@@ -8,6 +8,39 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Two animated SVG diagrams for the wiki**, in the style of the README banner
+  and generated the same way. `assets/build-flow.svg` walks the six stages and,
+  for each, the failure it prevents, the file it leaves behind and the signal
+  that it worked, with the artefacts accumulating into an inventory for demo
+  day. `assets/skills.svg` shows every skill's one-line description beside what
+  its body would cost, then the arithmetic behind "nine skills cost almost
+  nothing": the descriptions are a sliver, and loading all nine bodies on every
+  turn would cost roughly fourteen times as much. Every number in it is measured
+  from `payload/skills/` at build time.
+- **`tools/lib/svg.mjs`** — the timeline machinery the three diagrams share, so
+  the keyframe arithmetic and the reduced-motion still frames live in one place.
+- **`npm run build:flow`, `build:skills` and `build:svg`**, alongside the
+  existing `build:banner`.
+
+### Changed
+
+- **The README banner now runs over 35 seconds** rather than 24, which is a
+  comfortable length to narrate over in a demo video. The timeline is authored
+  against design seconds and played back over the cycle, so the pacing is
+  unchanged — every frame is the one that used to appear at the proportionally
+  equivalent moment.
+
+### Fixed
+
+- **Drawn paths faded out across the whole animation.** The `draw` helper named
+  `opacity` only on its closing keyframe, and CSS interpolates a property from
+  the element's base value at 0% rather than holding it, so every drawn arrow
+  and connector — including the banner's compaction arrow — arrived at its
+  finished moment at a few percent opacity. A test now rejects any keyframe set
+  that declares a property it does not also declare on the first stop.
+
+### Added
+
 - **A fifteen-page student handbook** in `wiki/`, published to the repository's
   GitHub wiki. Setup, the six-stage build flow, the three engineering
   disciplines, Firecrawl, testing and evals, demo day, troubleshooting, an FAQ,
