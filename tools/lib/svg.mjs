@@ -41,8 +41,16 @@ export const STROKE = { blue: C.blue, green: C.green, orange: C.orange, red: C.r
 export const FONT =
   "'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Helvetica,Arial,sans-serif";
 
-/** 35 seconds: a comfortable length to narrate over in a demo video. */
-export const CYCLE = 35;
+/**
+ * 70 seconds, which is 35 played at half speed.
+ *
+ * 35s fits a demo narration script, but it is not enough time to *read* a
+ * diagram: each beat was gone before the eye had finished the line under it.
+ * Doubling the cycle leaves the pacing and the proportions untouched — every
+ * frame still arrives at the same point in the story — and gives a viewer about
+ * twice as long on each one.
+ */
+export const CYCLE = 70;
 
 export const esc = (s) =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

@@ -103,12 +103,15 @@ const STAGES = [
 /* ------------------------------------------------------------------ *
  * Timeline
  * ------------------------------------------------------------------ *
- * Authored in real seconds: DESIGN and the playback cycle are both 35, which
- * is a comfortable length to narrate over in a demo video. Each stage gets
- * about 4.9s — long enough to read its three lines aloud — and the last 2s
- * holds the finished picture, which is also the reduced-motion still frame.
+ * Authored against DESIGN seconds and played back over CYCLE, so the six
+ * stages share the loop evenly however long it runs. The last stretch holds the
+ * finished picture, which is also the reduced-motion still frame.
  */
-const DESIGN = CYCLE;
+// Authored length, in design seconds. Deliberately NOT tied to CYCLE: CYCLE is
+// how long the loop takes to play, DESIGN is how long the story is. Setting one
+// from the other means changing the playback length silently rescales where
+// ENDS falls, and the back of the loop plays as empty canvas.
+const DESIGN = 35;
 const ENDS = 33.4;
 
 const T0 = 1.8;            // first stage opens
@@ -150,8 +153,8 @@ body.push(
     'Six stages. Each one prevents one specific, expensive failure — and makes the next one cheaper.',
     { size: 12.5, fill: C.muted },
   ),
-  t(964, 46, `${STAGES.length} stages`, { size: 12, fill: C.faint, anchor: 'end', ls: 0.6 }),
-  t(964, 70, 'demo day: December 1st, 2026', { size: 12, fill: C.faint, anchor: 'end' }),
+  t(964, 46, `${STAGES.length} stages`, { size: 12, fill: C.muted, anchor: 'end', ls: 0.6 }),
+  t(964, 70, 'demo day: December 1st, 2026', { size: 12, fill: C.muted, anchor: 'end' }),
 );
 
 /* ------------------------------------------------------------------ *
@@ -194,11 +197,11 @@ STAGES.forEach((s, i) => {
     t(cx(i), PILL_Y - 10, `stage ${String(i + 1).padStart(2, '0')}`, {
       size: 9,
       anchor: 'middle',
-      fill: C.faint,
+      fill: C.muted,
       ls: 0.7,
       cls: fade(0.6, ENDS),
     }),
-    station(i, fade(0.9, ENDS, { hold: 0.34 }), 1),
+    station(i, fade(0.9, ENDS, { hold: 0.55 }), 1),
     station(i, fade(at(i), ENDS), 1),
     // A ring that beats only while this stage is the one being talked about.
     `<rect x="${px(i) - 4}" y="${PILL_Y - 4}" width="${PILL_W + 8}" height="${PILL_H + 8}" rx="12"` +
@@ -261,7 +264,7 @@ STAGES.forEach((s, i) => {
   body.push(
     `<g class="${fade(tIn, tOut, { rise: 7 })}">` +
       `<rect x="${PANEL.x}" y="${PANEL.y}" width="${PANEL.w}" height="${PANEL.h}" rx="11"` +
-      ` fill="${C.panel}" stroke="${C.track}" stroke-width="1.2"/>` +
+      ` fill="${C.panel}" stroke="${STROKE[s.kind]}" stroke-width="1.3"/>` +
       `<rect x="${PANEL.x + 1}" y="${PANEL.y + 12}" width="4.5" height="${PANEL.h - 24}" rx="2.3"` +
       ` fill="${STROKE[s.kind]}"/>` +
       t(PANEL.x + 24, PANEL.y + 38, s.name, { size: 20, weight: 700, fill: STROKE[s.kind] }) +
@@ -292,7 +295,7 @@ STAGES.forEach((s, i) => {
 body.push(
   `<g class="${fade(at(0) + 2.2, ENDS)}">` +
     `<line x1="310" y1="434" x2="970" y2="434" stroke="${C.track}" stroke-width="1.2"/>` +
-    t(30, 438, 'WHAT YOU HAVE ON DECEMBER 1ST', { size: 10.5, fill: C.faint, ls: 1.1 }) +
+    t(30, 438, 'WHAT YOU HAVE ON DECEMBER 1ST', { size: 10.5, fill: C.muted, ls: 1.1 }) +
     `</g>`,
 );
 
@@ -303,17 +306,19 @@ STAGES.forEach((s, i) => {
   body.push(
     `<g class="${fade(at(i) + 2.2, ENDS, { rise: 9 })}">` +
       `<rect x="${x}" y="${CARD.y}" width="${PILL_W}" height="${CARD.h}" rx="8"` +
-      ` fill="${C.panelAlt}" stroke="${C.track}" stroke-width="1.1"/>` +
+      ` fill="${C.panelAlt}" stroke="${STROKE[s.kind]}" stroke-width="1.2"/>` +
       `<rect x="${x + 1}" y="${CARD.y + 8}" width="3.5" height="${CARD.h - 16}" rx="1.8"` +
       ` fill="${STROKE[s.kind]}"/>` +
       lines
-        .map((l, n) => t(x + 11, CARD.y + 17 + n * 11.5, l, { size: 9.6, fill: C.text }))
+        .map((l, n) =>
+          t(x + 11, CARD.y + 17 + n * 11.5, l, { size: 9.6, fill: C.white, weight: 600 }),
+        )
         .join('') +
       sub
         .map((l, n) =>
           t(x + 11, CARD.y + 20 + lines.length * 11.5 + n * 10.5, l, {
             size: 8.8,
-            fill: C.faint,
+            fill: C.muted,
           }),
         )
         .join('') +
@@ -375,4 +380,7 @@ await fs.writeFile(OUT, svg, 'utf8');
 
 console.log(`wrote ${path.relative(process.cwd(), OUT)}`);
 console.log(`  ${(svg.length / 1024).toFixed(1)} KB, ${tl.count} animated elements, ${CYCLE}s loop`);
-console.log(`  ${STAGES.length} stages, ${STEP}s each, last opens at ${LAST}s, ends ${ENDS}s`);
+console.log(
+  `  ${STAGES.length} stages, ${STEP}s each in design time` +
+    ` (${((STEP * CYCLE) / DESIGN).toFixed(1)}s on screen), last opens at ${LAST}s, ends ${ENDS}s of ${DESIGN}`,
+);

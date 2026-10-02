@@ -45,10 +45,10 @@ const RULE_COUNT = (await fs.readdir(path.join(payloadRoot(), 'rules'))).filter(
  * ------------------------------------------------------------------ */
 /**
  * Every time below is a "design second". The timeline is authored against
- * DESIGN and played back over CYCLE (35s, a comfortable length to narrate
- * over in a demo video), so changing the playback length stretches the whole
- * thing evenly instead of leaving dead air at the end. Roughly 11s per act,
- * which is about 25 spoken words each.
+ * DESIGN and played back over CYCLE, so changing the playback length stretches
+ * the whole thing evenly instead of leaving dead air at the end. At the current
+ * cycle that is a little over 23s per act — long enough to narrate, and long
+ * enough to read.
  */
 const DESIGN = 24;
 

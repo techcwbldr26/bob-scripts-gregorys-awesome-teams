@@ -56,6 +56,13 @@ const CHAIN = [
 ];
 const SITUATIONAL = ['wizard', 'rag-architecture', 'harness-tuning'];
 
+/**
+ * The chain warms from blue to orange across the six stages, matching the build
+ * flow diagram. The three situational skills are blue: in the banner's palette
+ * blue is the standing machinery that is simply there, which is what they are.
+ */
+const SITUATIONAL_KIND = 'blue';
+
 const order = [...CHAIN.map(([n]) => n), ...SITUATIONAL];
 const missing = order.filter((n) => !byName.has(n));
 if (missing.length || order.length !== skills.length) {
@@ -72,7 +79,7 @@ const CARDS = order.map((name, i) => {
   const s = byName.get(name);
   return {
     name,
-    kind: i < CHAIN.length ? CHAIN[i][1] : null,
+    kind: i < CHAIN.length ? CHAIN[i][1] : SITUATIONAL_KIND,
     chain: i < CHAIN.length,
     // The first sentence is the part a human reads; the rest is the "use when"
     // clause that tells Bob when to reach for it.
@@ -103,10 +110,15 @@ const num = (n) => n.toLocaleString('en-US');
 /* ------------------------------------------------------------------ *
  * Timeline
  * ------------------------------------------------------------------ *
- * Four acts over 35s, which is a comfortable length to narrate over: the shelf
- * fills, the bill arrives, one body loads, and then the counterfactual.
+ * Four acts: the shelf fills, the bill arrives, one body loads, and then the
+ * counterfactual. Authored against DESIGN seconds and played back over CYCLE,
+ * so the whole thing stretches evenly when the loop length changes.
  */
-const DESIGN = CYCLE;
+// Authored length, in design seconds. Deliberately NOT tied to CYCLE: CYCLE is
+// how long the loop takes to play, DESIGN is how long the story is. Setting one
+// from the other means changing the playback length silently rescales where
+// ENDS falls, and the back of the loop plays as empty canvas.
+const DESIGN = 35;
 const ENDS = 33.4;
 
 const CARD_T0 = 1.0;
@@ -165,7 +177,7 @@ CARDS.forEach((_, i) => {
     t(964, 70, `≈ ${num(sum)} tokens of description in context`, {
       size: 11.5,
       anchor: 'end',
-      fill: C.faint,
+      fill: C.muted,
       cls: fade(cardAt(i), tOut, { cut: true }),
     }),
   );
@@ -177,13 +189,13 @@ CARDS.forEach((_, i) => {
 body.push(
   t(32, 104, 'THE MAIN CHAIN — the six stages, in order', {
     size: 10.5,
-    fill: C.faint,
+    fill: C.muted,
     ls: 1.1,
     cls: fade(0.6, ENDS),
   }),
   t(32, 358, 'WHEN THEY APPLY — and only then', {
     size: 10.5,
-    fill: C.faint,
+    fill: C.muted,
     ls: 1.1,
     cls: fade(cardAt(CHAIN.length) - 0.3, ENDS),
   }),
@@ -192,14 +204,14 @@ body.push(
 CARDS.forEach((c, i) => {
   const x = cardX(i);
   const y = cardY(i);
-  const accent = c.chain ? STROKE[c.kind] : C.faint;
+  const accent = STROKE[c.kind];
   const lines = wrap(c.summary, 49).slice(0, 4);
   body.push(
     `<g class="${fade(cardAt(i), ENDS, { rise: 10 })}">` +
       `<rect x="${x}" y="${y}" width="${CARD.w}" height="${CARD.h}" rx="9"` +
-      ` fill="${c.chain ? `url(#hatch-${c.kind})` : C.panel}" stroke="${accent}"` +
-      ` stroke-width="${c.chain ? 1.6 : 1.1}"/>` +
-      t(x + 14, y + 24, `$${c.name}`, { size: 12.5, weight: 600, fill: c.chain ? C.white : C.text }) +
+      ` fill="url(#hatch-${c.kind})" stroke="${accent}"` +
+      ` stroke-width="${c.chain ? 1.6 : 1.2}"${c.chain ? '' : ' stroke-dasharray="5 3"'}/>` +
+      t(x + 14, y + 24, `$${c.name}`, { size: 12.5, weight: 600, fill: C.white }) +
       lines
         .map((l, n) => t(x + 14, y + 44 + n * 12.5, l, { size: 10, fill: C.text, op: 0.92 }))
         .join('') +
