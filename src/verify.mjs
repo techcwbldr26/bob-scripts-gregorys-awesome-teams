@@ -6,7 +6,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-import { BOB_PATHS, FIRECRAWL_SERVER_KEY, MANAGED_BEGIN } from './constants.mjs';
+import { BOB_PATHS, COMMANDS, FIRECRAWL_SERVER_KEY, MANAGED_BEGIN } from './constants.mjs';
 import { readIfExists } from './fsx.mjs';
 import { isValidSkillFolder, parseFrontMatter } from './payload.mjs';
 
@@ -40,18 +40,19 @@ export async function verify(target) {
     check('SKILLS.md', skillsIndex !== null, skillsIndex === null ? 'missing' : 'present'),
   );
 
-  // Slash command.
-  const commandFile = path.join(target, BOB_PATHS.commands, 'gregorys-awesome-teams.md');
-  const command = await readIfExists(commandFile);
-  checks.push(
-    check(
-      '/gregorys-awesome-teams command',
-      command !== null,
-      command === null
-        ? `missing ${path.relative(target, commandFile)}`
-        : 'installed',
-    ),
-  );
+  // Slash commands. Driven by the COMMANDS list so a new command cannot ship
+  // without a check.
+  for (const name of COMMANDS) {
+    const commandFile = path.join(target, BOB_PATHS.commands, `${name}.md`);
+    const command = await readIfExists(commandFile);
+    checks.push(
+      check(
+        `/${name} command`,
+        command !== null,
+        command === null ? `missing ${path.relative(target, commandFile)}` : 'installed',
+      ),
+    );
+  }
 
   // Skills: validate each the way Bob does, since Bob fails silently.
   const skillsDir = path.join(target, BOB_PATHS.skills);

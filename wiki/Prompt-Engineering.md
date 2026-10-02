@@ -28,6 +28,49 @@ fails this test in the same way — it assumes something you know and never said
 
 ---
 
+## You do not have to do this by hand
+
+Put `/improve-prompt` in front of a rough request and send it:
+
+```
+/improve-prompt  make the search better
+```
+
+You get back four things:
+
+1. **The improved prompt**, in a block you can copy.
+2. **A table of what changed** — what was missing, what it added, and the
+   principle behind each change.
+3. **What should not be in a prompt at all**, and where it belongs instead — a
+   rule, `AGENTS.md`, a skill, the glossary.
+4. **What it costs**, honestly.
+
+It rewrites. It does not run the task. `/improve-prompt build me a login system`
+returns a better prompt for building a login system, not a login system.
+
+**Where it will leave a blank.** It never invents your acceptance criteria. If
+your prompt has no finish line, you get a visible placeholder:
+
+```
+[FILL: what does done mean here? a number or a test, not "it works"]
+```
+
+That is the command working, not failing. Nobody but you knows what "done" means
+for your project, and a made-up criterion is worse than a missing one because
+you will not notice it is wrong.
+
+**A warning about length.** The improved prompt is usually *longer* than what you
+typed, and students told to "save tokens" sometimes read that as a failure. It is
+not. The cost that matters is the whole exchange: a vague prompt buys you
+clarification turns, wrong work and a rewrite — and [every one of those turns
+re-sends the entire conversation](Context-Engineering). A prompt that lands
+first time is cheaper than a short one that does not.
+
+Run it on a few of your own prompts in week one. The structure is the thing you
+are meant to learn; after a fortnight you will be writing it without the command.
+
+---
+
 ## What the labs agree on
 
 Anthropic, OpenAI and DeepSeek publish guidance for different models trained in

@@ -80,6 +80,7 @@ Bob finishes by running a check. Every line should say `ok`:
   ok   AGENTS.md                    present, managed block found
   ok   SKILLS.md                    present
   ok   /gregorys-awesome-teams command installed
+  ok   /improve-prompt command      installed
   ok   skills                       9 skills valid
   ok   rules                        4 rule files in .bob/rules
   ok   Firecrawl MCP                registered over streamable-http

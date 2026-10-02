@@ -6,6 +6,38 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **`/improve-prompt`** — a second slash command, asked for by a student. Type
+  it in front of a rough request and you get back a structured prompt, a table
+  of what changed and why, the parts that should move out of the prompt and into
+  the harness, and an honest note on what it costs.
+
+  It **rewrites rather than executes**: `/improve-prompt build me a login
+  system` returns a better prompt for building a login system, not a login
+  system. That distinction is the feature, and a test asserts it.
+
+  It **never invents a requirement**. A prompt with no finish line comes back
+  with a visible `[FILL: …]` placeholder rather than a plausible acceptance
+  criterion the student would not notice was wrong.
+
+  The section students will not find elsewhere is the third one: if an
+  instruction belongs on every turn, it is not a prompt problem. The command
+  routes it to `.bob/rules/`, `AGENTS.md`, a skill or `GLOSSARY.md` — paid once
+  instead of retyped forever.
+
+  Documented on the wiki's Prompt Engineering page, in the README, in
+  `docs/student-quickstart.md`, and in `START-HERE.md`.
+
+### Changed
+
+- **`verify` now checks every installed command**, driven by a new `COMMANDS`
+  list in `src/constants.mjs` rather than naming one command inline, so adding a
+  command cannot leave a check behind. The sample verify output on the wiki's
+  Getting Started page was updated to match.
+- **`AGENTS.md` gains one line** for the new command. One line is the budget: it
+  is paid on every turn, and a test fails if the mention grows beyond that.
+
 ### Changed
 
 - **`wiki/Home.md` now matches the live wiki.** The landing page was edited in

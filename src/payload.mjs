@@ -18,6 +18,7 @@ import {
   DEMO_DATE,
   FIRECRAWL_API_KEY_VAR,
   FIRECRAWL_SIGNUP_URL,
+  IMPROVE_COMMAND_NAME,
 } from './constants.mjs';
 
 /** Line-coverage gate this project holds itself and its students to. */
@@ -34,6 +35,7 @@ export function tokens() {
   return {
     DEMO_DATE,
     COMMAND_NAME,
+    IMPROVE_COMMAND: IMPROVE_COMMAND_NAME,
     COVERAGE_GATE: String(COVERAGE_GATE),
     CONTEXT_CAP: group(CONTEXT.capTokens),
     COMPACTION_START: group(CONTEXT.compactionStartsAroundTokens),

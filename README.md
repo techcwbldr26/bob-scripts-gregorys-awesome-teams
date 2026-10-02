@@ -52,6 +52,17 @@ Then, in Bob:
 /gregorys-awesome-teams  I want to build <your idea>
 ```
 
+Not sure how to word a request? Put `/improve-prompt` in front of it and send
+the rough version:
+
+```
+/improve-prompt  make the search better
+```
+
+You get back a structured prompt, a table of what changed and why, and anything
+that should move out of your prompt and into the harness. It rewrites; it does
+not run the task.
+
 Get a free Firecrawl key at <https://www.firecrawl.dev/signup> — 1,000 credits a
 month, refreshed monthly, no credit card. Connect your social accounts for more.
 
@@ -66,7 +77,8 @@ your-project/
 ├── .bob/
 │   ├── mcp.json                Firecrawl MCP server (merged, not overwritten)
 │   ├── commands/
-│   │   └── gregorys-awesome-teams.md    The /gregorys-awesome-teams command
+│   │   ├── gregorys-awesome-teams.md    Routes an idea into the build flow
+│   │   └── improve-prompt.md            Rewrites a rough prompt, and explains it
 │   ├── rules/                  Four always-on rules
 │   └── skills/                 Nine skills, loaded on demand
 ├── examples/                   Worked artefacts to copy

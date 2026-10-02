@@ -4,6 +4,10 @@ Bob keeps only each skill's `description` in context and loads the body when it
 decides the skill applies, so this whole set is cheap to have installed.
 Invoke one explicitly with `$<skill-name>`, or type `/skills` to pick from a list.
 
+Two slash commands come with them: `/{{COMMAND_NAME}}` routes an idea into the
+right stage of the build, and `/{{IMPROVE_COMMAND}}` rewrites a rough prompt and
+shows you what changed.
+
 {{SKILL_TABLE}}
 
 ## The main chain

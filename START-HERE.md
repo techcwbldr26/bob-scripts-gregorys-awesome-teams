@@ -159,6 +159,9 @@ In plain language, tell me:
 - that I begin work by typing /gregorys-awesome-teams followed by my idea
 - that the first thing it will do is research, not design, because building the
   wrong thing correctly is the most expensive mistake available this semester
+- that if I am ever unsure how to word a request, I can type /improve-prompt
+  followed by my rough wording, and it will rewrite the prompt and show me what
+  it changed, without doing the task
 Then stop. Do not start building my project yet.
 
 RULES THROUGHOUT
