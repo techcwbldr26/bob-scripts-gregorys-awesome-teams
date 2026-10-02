@@ -11,7 +11,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **`/improve-prompt`** — a second slash command, asked for by a student. Type
   it in front of a rough request and you get back a structured prompt, a table
   of what changed and why, the parts that should move out of the prompt and into
-  the harness, and an honest note on what it costs.
+  the harness, and what the result saves in the context window.
 
   It **rewrites rather than executes**: `/improve-prompt build me a login
   system` returns a better prompt for building a login system, not a login
@@ -25,6 +25,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   instruction belongs on every turn, it is not a prompt problem. The command
   routes it to `.bob/rules/`, `AGENTS.md`, a skill or `GLOSSARY.md` — paid once
   instead of retyped forever.
+
+  The fourth section is **context engineering, not word count**. A prompt
+  carrying the right task and the right file references finishes the work inside
+  one tight window; a vague one sends the agent hunting through whole files,
+  buys clarification turns that each re-send the conversation, and leaves wrong
+  work in the window to be undone. The command names which of those it removed
+  and ties the result to the 270,000-token window and the compaction
+  threshold.
 
   Documented on the wiki's Prompt Engineering page, in the README, in
   `docs/student-quickstart.md`, and in `START-HERE.md`.

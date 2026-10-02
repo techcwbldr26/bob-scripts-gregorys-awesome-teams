@@ -90,17 +90,32 @@ describe('/improve-prompt teaches the structure, not just the answer', () => {
       '### 1. The improved prompt',
       '### 2. What changed',
       '### 3. What does not belong in a prompt at all',
-      '### 4. What it costs',
+      '### 4. What this saves in the context window',
     ]) {
       assert.ok(text.includes(heading), `missing section: ${heading}`);
     }
   });
 
-  it('is honest that a better prompt is often a longer one', async () => {
-    // Students who are told to "save tokens" will otherwise read brevity as the
-    // goal and strip out the acceptance criteria that make the prompt work.
-    assert.match(await source(), /often \*\*longer\*\*/);
-    assert.match(await source(), /Length is not the cost that matters/);
+  it('frames the saving as context, not as word count', async () => {
+    // The saving comes from a well-engineered prompt carrying the right context,
+    // so the session stays cheap. It is not about how much the student typed or
+    // how much came back, and an edit that drifts back to word count fails here.
+    const text = await source();
+    assert.match(text, /Not words\. Context\./);
+    for (const cause of ['Hunting', 'Clarification turns', 'Wrong work', 'Repetition']) {
+      assert.ok(text.includes(`**${cause}.**`), `missing the ${cause} cost`);
+    }
+    assert.doesNotMatch(
+      text,
+      /\blonger than the original\b/,
+      'the length of the prompt is not the lesson',
+    );
+  });
+
+  it('ties the saving to the real window numbers', async () => {
+    const { text } = render(await source());
+    assert.match(text, /270,000 tokens/, 'the cap, rendered from the payload');
+    assert.match(text, /compaction starts around 190,000/);
   });
 
   it('routes standing instructions into the harness instead of the prompt', async () => {

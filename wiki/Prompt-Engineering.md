@@ -43,7 +43,8 @@ You get back four things:
    principle behind each change.
 3. **What should not be in a prompt at all**, and where it belongs instead — a
    rule, `AGENTS.md`, a skill, the glossary.
-4. **What it costs**, honestly.
+4. **What it saves you in the context window**, with real numbers where it has
+   them.
 
 It rewrites. It does not run the task. `/improve-prompt build me a login system`
 returns a better prompt for building a login system, not a login system.
@@ -59,12 +60,19 @@ That is the command working, not failing. Nobody but you knows what "done" means
 for your project, and a made-up criterion is worse than a missing one because
 you will not notice it is wrong.
 
-**A warning about length.** The improved prompt is usually *longer* than what you
-typed, and students told to "save tokens" sometimes read that as a failure. It is
-not. The cost that matters is the whole exchange: a vague prompt buys you
-clarification turns, wrong work and a rewrite — and [every one of those turns
-re-sends the entire conversation](Context-Engineering). A prompt that lands
-first time is cheaper than a short one that does not.
+**Why this saves tokens, which is not what most people assume.** It has nothing
+to do with how much you type or how much comes back. A prompt carrying the right
+task and the right file references gets the work done inside one tight window. A
+vague one sends the agent hunting — opening whole files, filling the window with
+results nobody needed — then costs you clarification turns, and every one of
+those [re-sends the entire conversation](Context-Engineering). Then the work
+built on the misunderstanding has to be read and undone, and that stays in the
+window too.
+
+None of that is about word count. It is [context
+engineering](Context-Engineering), arriving through the prompt. Keep the window
+small and you finish the feature without ever reaching compaction — which is the
+whole point, because compaction is lossy and takes the decisions you made early.
 
 Run it on a few of your own prompts in week one. The structure is the thing you
 are meant to learn; after a fortnight you will be writing it without the command.

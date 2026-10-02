@@ -96,22 +96,34 @@ Typing an instruction every turn is the expensive way to hold it. Offer to make
 the change; do not make it unasked. If there is nothing to promote, say so in
 one line and move on.
 
-### 4. What it costs
+### 4. What this saves in the context window
 
-Give the honest arithmetic, in three lines or so:
+Not words. Context.
 
-- The improved prompt is often **longer** than the original. Say so plainly.
-  Length is not the cost that matters.
-- What matters is the whole exchange. A vague prompt buys clarification turns,
-  wrong work and a rewrite — and every one of those turns re-sends the entire
-  conversation. A prompt that lands first time is cheaper than a short one that
-  does not.
-- Name where this version actually saves: line ranges instead of a pasted file,
-  a skill name instead of a restated procedure, and anything section 3 moved
-  into the harness, which is now paid once rather than every turn.
+A prompt that carries the right task, the right finish line and the right file
+references gets the work done inside one tight window. A vague one does not, and
+the difference arrives as tokens that stay in the window for the rest of the
+session. Name the ones that apply here:
 
-Where a file was pasted or a whole directory referenced, estimate the tokens
-that change alone saves and mark it as an estimate.
+- **Hunting.** With no path and no line range the agent searches, opens whole
+  files and fills the window with tool results nobody needed. This is usually
+  the largest single line item, and the easiest to remove.
+- **Clarification turns.** Every round trip re-sends the entire conversation, so
+  one missing sentence costs the whole history again, not one question.
+- **Wrong work.** Code built against a misunderstanding has to be read,
+  discussed and undone — and all of that stays in the window afterwards.
+- **Repetition.** Anything section 3 moves into the harness is carried by Bob
+  once per turn instead of being retyped into every prompt.
+
+Give a real estimate where you have one: the size of the file that no longer
+has to be opened in full, or the clarification turns the added finish line
+removes. Mark it as an estimate.
+
+Then close on where it lands. Bob's window is {{CONTEXT_CAP}} tokens and
+compaction starts around {{COMPACTION_START}}. Compaction is lossy — it
+summarises away the decisions made early in the session. Keeping the window
+small is not about being terse; it is how a team finishes a feature without ever
+reaching that point.
 
 ## Keep yourself honest
 
