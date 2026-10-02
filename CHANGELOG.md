@@ -6,6 +6,34 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **All three animated SVGs now loop over 70 seconds instead of 35** — the same
+  timelines at half speed. 35s suited a narration script but not a reader: each
+  beat was gone before the eye had finished the line underneath it. The loop
+  length is `CYCLE` in `tools/lib/svg.mjs` and all three share it; because each
+  diagram is authored against its own `DESIGN` seconds, the pacing and the
+  proportions are untouched. Frames rendered at equivalent points in the story
+  are byte-identical to the 35s versions.
+- **The two wiki diagrams now carry colour the way the banner does.** The
+  palette was already shared and identical, but the new diagrams leant on grey
+  where the banner leans on colour: unreached stations faded towards grey, the
+  detail panel and the artefact cards had grey hairline borders, the three
+  situational skills were the only colourless cards in any of the three images,
+  and structural labels sat at `faint` rather than `muted`. Borders now take
+  their element's colour, artefact names are set like the banner's feature
+  headings, and the situational skills are blue — the banner's colour for the
+  standing machinery that is simply there — distinguished by a dashed border
+  rather than by having no colour at all.
+
+### Fixed
+
+- **`DESIGN = CYCLE` in the two wiki generators** tied the authored length of a
+  diagram to its playback length, so doubling the cycle left the whole back half
+  of the loop as empty canvas. The two are now independent, with a comment
+  saying why, and a test rejects any diagram whose last keyframe before 100%
+  falls below 90%.
+
 ### Added
 
 - **Two animated SVG diagrams for the wiki**, in the style of the README banner

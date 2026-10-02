@@ -163,9 +163,14 @@ npm run build:svg        # or build:banner / build:flow / build:skills
 npm test                 # a test fails if a committed SVG drifts
 ```
 
-Do not hand-edit an SVG: each one is a single 35-second CSS timeline, every
+Do not hand-edit an SVG: each one is a single looping CSS timeline, every
 element's keyframes are percentages of that cycle, and the readouts track
 running totals measured from `payload/`. The generators do that arithmetic.
+
+The loop length is `CYCLE` in `tools/lib/svg.mjs` and all three share it. Each
+diagram is authored against its own `DESIGN` seconds and played back over
+`CYCLE`, so changing `CYCLE` restretches everything evenly rather than leaving
+dead air at the end — the pacing and the proportions are unaffected.
 
 Three things are easy to get wrong, and all three are covered by tests:
 

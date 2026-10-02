@@ -16,6 +16,8 @@ import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { describe, it } from 'node:test';
 
+import { CYCLE } from '../../tools/lib/svg.mjs';
+
 const run = promisify(execFile);
 
 export const repoRoot = path.resolve(
@@ -179,12 +181,32 @@ export function describeGeneratedSvg({ label, asset, generator, minClasses, maxK
       }
     });
 
-    it('runs every animation over the same loop length', async () => {
+    it('runs every animation over the one shared loop length', async () => {
       const style = styleOf(await svg());
       const durations = new Set(
         [...style.matchAll(/animation:[a-z]\d+ ([\d.]+)s /g)].map((m) => m[1]),
       );
-      assert.deepEqual([...durations], ['35'], 'every element should share the 35s cycle');
+      assert.deepEqual(
+        [...durations],
+        [String(CYCLE)],
+        `every element should share the ${CYCLE}s cycle from tools/lib/svg.mjs`,
+      );
+    });
+
+    it('keeps playing until the end of the loop', async () => {
+      // A diagram authored against DESIGN seconds and played over a longer
+      // CYCLE is correct; one whose DESIGN was accidentally tied to CYCLE is
+      // not — it reaches its final state early and then plays the rest of the
+      // loop as empty canvas. The latest stop before 100% catches that.
+      const style = styleOf(await svg());
+      const stops = [...style.matchAll(/([\d.]+)%/g)]
+        .map((m) => Number(m[1]))
+        .filter((n) => n < 100);
+      assert.ok(
+        Math.max(...stops) >= 90,
+        `the last keyframe before 100% is at ${Math.max(...stops)}% — the diagram ` +
+          'finishes early and the rest of the loop is blank',
+      );
     });
 
     it('keeps every keyframe set in ascending order', async () => {
