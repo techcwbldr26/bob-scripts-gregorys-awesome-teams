@@ -8,6 +8,40 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- **Rewrote the opening of the three engineering pages in the wiki.** Each one
+  previously opened with two lines of assertion and went straight into
+  mechanics, which told a student what to type but never why any of it works.
+
+  - **Harness Engineering** now opens on Böckeler's framing — *Agent = Model +
+    Harness* — and on BCG's five-part operating system (specs, constitution,
+    control panel, context hub, quality gates), mapped item by item onto the
+    files this kit installs, so the concept and the repository are the same
+    table. Adds the guides-versus-sensors diagnostic, BCG's four kinds of
+    quality gate, and the maturity ladder from "check everything" to "spot
+    check now and then".
+  - **Context Engineering** now explains *context rot* and the n² attention
+    argument, so students understand that accuracy degrades well before the
+    window fills — the single most load-bearing fact on the page and previously
+    absent. Adds Anthropic's "smallest possible set of high-signal tokens"
+    principle and their four techniques — just-in-time retrieval, structured
+    note-taking, compaction and sub-agents — each mapped to something that
+    already exists in the project.
+  - **Prompt Engineering** now opens on Anthropic's "brilliant but new
+    employee" test, then sets the three labs' published guidance side by side —
+    both where it converges and where it flatly contradicts itself. OpenAI tell
+    you to drop "think step by step" for reasoning models; DeepSeek's R1 model
+    card recommends it for maths. The lesson drawn is the kit's own first rule:
+    measure it on your task, because advice about a model expires.
+
+  Every quotation is from a primary source, linked inline with its date.
+
+- **`docs/publishing-the-wiki.md` no longer tells you to run `cp wiki/*.md`.**
+  That blanket copy silently reverts any page edited in the GitHub wiki UI,
+  with no conflict and no warning, because a wiki repository has no pull
+  requests and no CI. The procedure now diffs first and copies named pages.
+
+### Changed
+
 - **All three animated SVGs now loop over 70 seconds instead of 35** — the same
   timelines at half speed. 35s suited a narration script but not a reader: each
   beat was gone before the eye had finished the line underneath it. The loop

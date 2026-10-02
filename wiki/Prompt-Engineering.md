@@ -1,6 +1,134 @@
 # Prompt Engineering
 
-What you say. The cheapest thing to fix, so always check it first.
+What you say, in the message you send. It is the cheapest thing to change, so
+always check it first.
+
+Anthropic draws the line this way: prompt engineering is *"methods for writing
+and organizing LLM instructions for optimal outcomes"*, while [context
+engineering](Context-Engineering) is managing the whole window around them. Get
+the prompt right and you will be surprised how many "the model is bad at this"
+problems disappear.
+
+---
+
+## The mental model that does the most work
+
+> Think of Claude as a brilliant but new employee who lacks context on your
+> norms and workflows.
+>
+> — Anthropic, [Prompting best
+> practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
+
+Not "a search engine", not "a magic box". A capable new colleague on day one.
+
+Run the test on every prompt before you send it: **could a smart new hire, who
+has never seen this codebase, do the right thing with only this message?** If
+the answer is no, the model is not going to do better. Almost every weak prompt
+fails this test in the same way — it assumes something you know and never said.
+
+---
+
+## What the labs agree on
+
+Anthropic, OpenAI and DeepSeek publish guidance for different models trained in
+different ways. Where they converge is where you should spend your effort.
+
+A caveat you should see rather than have hidden from you: DeepSeek publish far
+less prompting guidance than the other two — their model card gives four usage
+recommendations and that is close to all of it. The dashes below are honest
+gaps, not points of disagreement.
+
+| The common advice | Anthropic | OpenAI | DeepSeek |
+| --- | --- | --- | --- |
+| **State the finish line precisely** | define success criteria *before* you start prompting | *"give very specific parameters for a successful response"* | — |
+| **Use structure to separate the parts** | XML tags around instructions, context and inputs | *"use delimiters like markdown, XML tags, and section titles"* | — |
+| **Say what you want, with constraints** | add context and motivation — explain *why* | *"explicitly outline those constraints in the prompt"* | — |
+| **Do not over-engineer it** | start minimal, add only to fix observed failures | *"keep prompts simple and direct"* | *"avoid adding a system prompt; all instructions should be contained within the user prompt"* |
+
+Sources: Anthropic, [Prompting best
+practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices);
+OpenAI, [Reasoning best
+practices](https://developers.openai.com/api/docs/guides/reasoning-best-practices);
+DeepSeek, [DeepSeek-R1 model
+card](https://huggingface.co/deepseek-ai/DeepSeek-R1). Retrieved 2 October 2026.
+
+---
+
+## Where they *disagree* — and why that is the most useful thing here
+
+Take the single most famous prompting phrase in existence — *"think step by
+step"* — and ask two vendors of **reasoning models** whether to use it.
+
+- **OpenAI:** *"Avoid chain-of-thought prompts. Since these models perform
+  reasoning internally, prompting them to 'think step by step' or 'explain your
+  reasoning' is unnecessary."*
+- **DeepSeek**, in the R1 model card's own usage recommendations: *"For
+  mathematical problems, it is advisable to include a directive in your prompt
+  such as: 'Please reason step by step, and put your final answer within
+  `\boxed{}`.'"*
+
+Same class of model. Opposite instructions. Both are each vendor's official
+guidance for their own model.
+
+Examples split the same way. Anthropic: *"Examples are one of the most reliable
+ways to steer Claude's output format, tone, and structure."* OpenAI, for
+reasoning models: *"Try zero shot first, then few shot if needed... reasoning
+models often don't need few-shot examples."*
+
+Nobody is lying. The advice is **model-specific**, and model-specific advice
+goes stale faster than anyone updates their notes — including this page.
+
+**So the only durable skill is measuring.** When someone — a blog post, a
+classmate, this page — tells you a prompting trick works, the correct response
+is to try it both ways on *your* task and keep what wins. That is
+[`$build-evals`](Skills-Reference), and it is why this kit treats evals as a
+build stage rather than an optional extra.
+
+It is also the kit's first rule, `00-evidence-over-memory`, applied to your own
+habits.
+
+---
+
+## Before you tune a prompt, know what "better" means
+
+Anthropic's prompt engineering guide opens by assuming you already have three
+things:
+
+1. a clear definition of the success criteria for your use case
+2. some way to **empirically test** against those criteria
+3. a first draft prompt to improve
+
+> If not, spend time establishing that first.
+
+This is the step students skip, and skipping it is why prompt tweaking turns
+into an afternoon of superstition. Without a criterion you are not improving a
+prompt, you are changing it and feeling differently about the result.
+
+DeepSeek make the same point as a measurement instruction rather than a
+principle: *"When evaluating model performance, it is recommended to conduct
+multiple tests and average the results."* One good run is not evidence. One bad
+run is not evidence either — which is worth remembering before you throw away a
+prompt that was actually fine.
+
+For a one-off question, "it looks right" is a fine criterion. For anything that
+goes in your demo, see [Testing and Evals](Testing-and-Evals).
+
+---
+
+## One more thing that is not obvious
+
+"Think step by step" is a habit from an earlier generation of models, when the
+reasoning had to be coaxed out in the visible answer. Modern reasoning models do
+it internally, which is why OpenAI now tells you to leave the phrase out — and
+why, as above, DeepSeek still wants it for maths on R1.
+
+The resolution is not to pick a side. It is to notice that you are holding a
+*belief about a model*, and that beliefs about models expire. Write down which
+model you tested it on and when, the same way you would for any other
+measurement.
+
+What never expires: be exact about the finish line, and let the model work out
+how to get there.
 
 ---
 

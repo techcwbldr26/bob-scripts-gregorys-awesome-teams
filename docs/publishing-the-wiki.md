@@ -13,21 +13,38 @@ Run this from anywhere. It takes about ten seconds.
 # 1. Clone the wiki repository (once; skip if you already have it)
 git clone https://github.com/techcwbldr26/bob-scripts-gregorys-awesome-teams.wiki.git /tmp/gat-wiki
 
-# 2. Copy the pages across
-cp /path/to/bob-scripts-gregorys-awesome-teams/wiki/*.md /tmp/gat-wiki/
+# 2. See what would change BEFORE copying anything (see the warning below)
+cd /tmp/gat-wiki
+for f in /path/to/bob-scripts-gregorys-awesome-teams/wiki/*.md; do
+  diff -q "$f" "$(basename "$f")" >/dev/null 2>&1 || echo "CHANGED: $(basename "$f")"
+done
 
-# 3. Commit
-cd /tmp/gat-wiki && git add -A && git commit -m "Update the student handbook"
+# 3. Copy across only the pages you meant to change
+cp /path/to/bob-scripts-gregorys-awesome-teams/wiki/The-Build-Flow.md /tmp/gat-wiki/
 
-# 4. Push
-git push
+# 4. Commit and push
+git add -A && git commit -m "Update the student handbook" && git push
 ```
 
-On Windows PowerShell, step 2 is:
+On Windows PowerShell, step 3 is:
 
 ```powershell
-Copy-Item C:\path\to\bob-scripts-gregorys-awesome-teams\wiki\*.md C:\temp\gat-wiki\
+Copy-Item C:\path\to\bob-scripts-gregorys-awesome-teams\wiki\The-Build-Flow.md C:\temp\gat-wiki\
 ```
+
+## Why step 2 matters
+
+**`cp wiki/*.md` is not safe to run blind.** A GitHub wiki can be edited in the
+browser, and those edits live only in the wiki repository — this repo never sees
+them. A blanket copy silently reverts every one of them, with no conflict and no
+warning, because the wiki repo has no pull requests and no CI to catch it.
+
+Run the diff first. If a page shows as changed and you did not change it here,
+someone edited it in the wiki UI: bring that edit back into `wiki/` in this
+repository first, then publish.
+
+The standing rule is still *do not edit pages in the GitHub wiki UI* — but the
+procedure should not punish you for having done it.
 
 ## Why this is not automated
 
