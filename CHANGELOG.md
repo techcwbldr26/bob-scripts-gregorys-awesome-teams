@@ -8,6 +8,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- **`wiki/Home.md` now matches the live wiki.** The landing page was edited in
+  the GitHub wiki UI on 1 October — the December 1st deadline came out of the
+  opening sentence and the "The deadline" section was deleted — and that edit
+  existed only in the wiki repository. It is now the version in this repo, so
+  the two no longer diverge and a publish cannot silently revert it. The
+  deadline is still stated on [Demo Day](../wiki/Demo-Day.md), which is where
+  the landing page points for it.
+
+### Changed
+
 - **Rewrote the opening of the three engineering pages in the wiki.** Each one
   previously opened with two lines of assertion and went straight into
   mechanics, which told a student what to type but never why any of it works.
