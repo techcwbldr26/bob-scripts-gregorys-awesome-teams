@@ -28,6 +28,57 @@ fails this test in the same way — it assumes something you know and never said
 
 ---
 
+## You do not have to do this by hand
+
+Put `/improve-prompt` in front of a rough request and send it:
+
+```
+/improve-prompt  make the search better
+```
+
+You get back four things:
+
+1. **The improved prompt**, in a block you can copy.
+2. **A table of what changed** — what was missing, what it added, and the
+   principle behind each change.
+3. **What should not be in a prompt at all**, and where it belongs instead — a
+   rule, `AGENTS.md`, a skill, the glossary.
+4. **What it saves you in the context window**, with real numbers where it has
+   them.
+
+It rewrites. It does not run the task. `/improve-prompt build me a login system`
+returns a better prompt for building a login system, not a login system.
+
+**Where it will leave a blank.** It never invents your acceptance criteria. If
+your prompt has no finish line, you get a visible placeholder:
+
+```
+[FILL: what does done mean here? a number or a test, not "it works"]
+```
+
+That is the command working, not failing. Nobody but you knows what "done" means
+for your project, and a made-up criterion is worse than a missing one because
+you will not notice it is wrong.
+
+**Why this saves tokens, which is not what most people assume.** It has nothing
+to do with how much you type or how much comes back. A prompt carrying the right
+task and the right file references gets the work done inside one tight window. A
+vague one sends the agent hunting — opening whole files, filling the window with
+results nobody needed — then costs you clarification turns, and every one of
+those [re-sends the entire conversation](Context-Engineering). Then the work
+built on the misunderstanding has to be read and undone, and that stays in the
+window too.
+
+None of that is about word count. It is [context
+engineering](Context-Engineering), arriving through the prompt. Keep the window
+small and you finish the feature without ever reaching compaction — which is the
+whole point, because compaction is lossy and takes the decisions you made early.
+
+Run it on a few of your own prompts in week one. The structure is the thing you
+are meant to learn; after a fortnight you will be writing it without the command.
+
+---
+
 ## What the labs agree on
 
 Anthropic, OpenAI and DeepSeek publish guidance for different models trained in

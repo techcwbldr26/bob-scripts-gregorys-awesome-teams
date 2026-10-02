@@ -137,6 +137,10 @@ discover → grill → spec → implement (TDD) → evals → demo rehearsal
 
 Ask `/gregorys-awesome-teams` at any point and it will tell you where you are.
 
+Stuck on how to word a request? Put `/improve-prompt` in front of your rough
+wording. It rewrites the prompt and shows you what it changed, without doing
+the task.
+
 ## Getting better results
 
 The habits that make the biggest difference, in order:

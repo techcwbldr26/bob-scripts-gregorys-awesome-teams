@@ -50,7 +50,8 @@ Bob's cap is {{CONTEXT_CAP}} tokens and compaction starts around
 
 ## Skills
 
-Run `/{{COMMAND_NAME}}` for the flow. The build chain is:
+Run `/{{COMMAND_NAME}}` for the flow, or `/{{IMPROVE_COMMAND}}` to turn a rough
+prompt into a well-structured one before sending it. The build chain is:
 
 ```
 discover → grill → spec → implement (TDD) → evals → demo rehearsal

@@ -6,6 +6,56 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **`/improve-prompt`** — a second slash command, asked for by a student. Type
+  it in front of a rough request and you get back a structured prompt, a table
+  of what changed and why, the parts that should move out of the prompt and into
+  the harness, and what the result saves in the context window.
+
+  It **rewrites rather than executes**: `/improve-prompt build me a login
+  system` returns a better prompt for building a login system, not a login
+  system. That distinction is the feature, and a test asserts it.
+
+  It **never invents a requirement**. A prompt with no finish line comes back
+  with a visible `[FILL: …]` placeholder rather than a plausible acceptance
+  criterion the student would not notice was wrong.
+
+  The section students will not find elsewhere is the third one: if an
+  instruction belongs on every turn, it is not a prompt problem. The command
+  routes it to `.bob/rules/`, `AGENTS.md`, a skill or `GLOSSARY.md` — paid once
+  instead of retyped forever.
+
+  The fourth section is **context engineering, not word count**. A prompt
+  carrying the right task and the right file references finishes the work inside
+  one tight window; a vague one sends the agent hunting through whole files,
+  buys clarification turns that each re-send the conversation, and leaves wrong
+  work in the window to be undone. The command names which of those it removed
+  and ties the result to the 270,000-token window and the compaction
+  threshold.
+
+  Documented on the wiki's Prompt Engineering page, in the README, in
+  `docs/student-quickstart.md`, and in `START-HERE.md`.
+
+### Changed
+
+- **`verify` now checks every installed command**, driven by a new `COMMANDS`
+  list in `src/constants.mjs` rather than naming one command inline, so adding a
+  command cannot leave a check behind. The sample verify output on the wiki's
+  Getting Started page was updated to match.
+- **`AGENTS.md` gains one line** for the new command. One line is the budget: it
+  is paid on every turn, and a test fails if the mention grows beyond that.
+
+### Changed
+
+- **`wiki/Home.md` now matches the live wiki.** The landing page was edited in
+  the GitHub wiki UI on 1 October — the December 1st deadline came out of the
+  opening sentence and the "The deadline" section was deleted — and that edit
+  existed only in the wiki repository. It is now the version in this repo, so
+  the two no longer diverge and a publish cannot silently revert it. The
+  deadline is still stated on [Demo Day](../wiki/Demo-Day.md), which is where
+  the landing page points for it.
+
 ### Changed
 
 - **Rewrote the opening of the three engineering pages in the wiki.** Each one

@@ -15,6 +15,17 @@ export const MANAGED_END = `<!-- END ${MANAGED_NAME} -->`;
 /** Slash command students type in Bob. Filename stem must equal the command. */
 export const COMMAND_NAME = 'gregorys-awesome-teams';
 
+/** Rewrites a rough prompt and shows the student what changed. */
+export const IMPROVE_COMMAND_NAME = 'improve-prompt';
+
+/**
+ * Every command this kit installs.
+ *
+ * `verify` and the tests read this list rather than naming commands one by one,
+ * so adding a command to `payload/commands/` cannot leave a check behind.
+ */
+export const COMMANDS = [COMMAND_NAME, IMPROVE_COMMAND_NAME];
+
 /**
  * Bob's project-scoped configuration surface.
  * source: https://bob.ibm.com/docs/ide/features/skills

@@ -1,7 +1,6 @@
 # Gregory's Awesome Teams
 
-This is the handbook for your project. You are building a product or service and
-demonstrating it live on **December 1st, 2026**, using the IBM Bob harness.
+This is the handbook for your project. You are building a product or service using the IBM Bob harness.
 
 **New here? Go straight to [Getting Started](Getting-Started).** It takes about
 ten minutes and you do not need to understand anything first.
@@ -68,9 +67,3 @@ If you can answer all five, the demo takes care of itself. The six stages in
 
 ---
 
-## The deadline
-
-**December 1st, 2026.** Live, in front of an audience.
-
-Work backwards from it. [Demo Day](Demo-Day) tells you what to do in the final
-weeks, and it is worth reading in week one rather than week eleven.
