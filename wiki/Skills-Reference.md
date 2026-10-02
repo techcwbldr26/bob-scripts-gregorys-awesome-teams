@@ -1,5 +1,7 @@
 # Skills Reference
 
+![An animated diagram of the nine skills. Each card shows one skill’s one-line description and what its body would cost, and a running readout counts the descriptions up to roughly 600 tokens. A stacked bar then compares what you actually pay in the context window — Bob’s baseline plus that sliver, plus one body while it runs — against what it would cost if all nine bodies were loaded on every turn.](https://raw.githubusercontent.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/main/assets/skills.svg)
+
 Nine skills. Type `$` in Bob to pick from a list, `$skill-name` to invoke one
 directly, or just describe what you need and Bob will reach for the right one.
 

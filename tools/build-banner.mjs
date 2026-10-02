@@ -20,6 +20,16 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { COVERAGE_GATE, payloadRoot, readSkills } from '../src/payload.mjs';
+import {
+  C,
+  CYCLE,
+  STROKE,
+  assemble,
+  esc,
+  hatchPatterns,
+  text as t,
+  timeline,
+} from './lib/svg.mjs';
 
 const OUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'assets', 'banner.svg');
 
@@ -31,35 +41,16 @@ const RULE_COUNT = (await fs.readdir(path.join(payloadRoot(), 'rules'))).filter(
 ).length;
 
 /* ------------------------------------------------------------------ *
- * Palette — sampled directly from the course diagram.
+ * Timeline
  * ------------------------------------------------------------------ */
-const C = {
-  bg: '#121212',
-  text: '#d3d3d3',
-  muted: '#a3a3a3',
-  faint: '#6f6f6f',
-  frame: '#d3d3d3',
-  blue: '#56a2e8',
-  blueFill: '#152a3a',
-  blueHatch: '#1d3f5c',
-  green: '#3a9a4b',
-  greenFill: '#152c1a',
-  greenHatch: '#1f4a2a',
-  orange: '#b86101',
-  orangeFill: '#2e1b06',
-  orangeHatch: '#4d2f08',
-  red: '#ff8383',
-  redFill: '#361f1f',
-  redHatch: '#5a2c2c',
-};
-
-const STROKE = { blue: C.blue, green: C.green, orange: C.orange, red: C.red };
-
-/* ------------------------------------------------------------------ *
- * Timeline. One 24s cycle, looping.
- * ------------------------------------------------------------------ */
-const CYCLE = 24;
-const pct = (t) => `${((t / CYCLE) * 100).toFixed(3)}%`;
+/**
+ * Every time below is a "design second". The timeline is authored against
+ * DESIGN and played back over CYCLE (35s, a comfortable length to narrate
+ * over in a demo video), so changing the playback length stretches the whole
+ * thing evenly instead of leaving dead air at the end. Roughly 11s per act,
+ * which is about 25 spoken words each.
+ */
+const DESIGN = 24;
 
 const ACT1 = 0.8;   // the window starts filling
 const ACT2 = 9.2;   // compaction fires
@@ -157,128 +148,15 @@ const CHAIN = ['discover', 'grill', 'spec', 'implement', 'evals', 'demo'];
 /* ------------------------------------------------------------------ *
  * Emitters
  * ------------------------------------------------------------------ */
-const esc = (s) =>
-  String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-const css = [];
 /**
- * Rules for `prefers-reduced-motion`. Turning the animation off is not enough:
- * every act's callout would then render at once, stacked on top of the others.
- * Each animated element also declares the state it should hold in a still
- * frame, which is the end of act three -- the most informative moment.
+ * `still` collects each element's `prefers-reduced-motion` state. Turning the
+ * animation off is not enough: every act's callout would then render at once,
+ * stacked on the others. The still frame is the end of act three, which is the
+ * most informative moment.
  */
-const still = [];
+const tl = timeline({ design: DESIGN, ends: ENDS });
+const { css, still, pct, fade, fadeDim, gauge, draw, pulse } = tl;
 const body = [];
-let uid = 0;
-
-/**
- * Fade an element in at `tIn` and hold it until `tOut`.
- * Returns the class name to put on the element.
- */
-function fade(tIn, tOut = ENDS, { rise = 0, hold = 1, cut = false } = {}) {
-  const name = `f${uid++}`;
-  // `cut` swaps the element instantly instead of crossfading. The running token
-  // readout needs it: with a 0.5s fade each number is still on screen while the
-  // next one arrives, and the two render on top of each other.
-  const inEnd = cut ? tIn + 0.001 : tIn + 0.5;
-  const outEnd = Math.min(tOut + (cut ? 0.001 : 0.5), CYCLE);
-  const from = rise ? `opacity:0;transform:translateY(${rise}px)` : 'opacity:0';
-  const to = rise ? `opacity:${hold};transform:translateY(0)` : `opacity:${hold}`;
-  css.push(
-    `@keyframes ${name}{0%,${pct(tIn)}{${from}}` +
-      `${pct(inEnd)},${pct(tOut)}{${to}}` +
-      `${pct(outEnd)},100%{opacity:0}}`,
-  );
-  css.push(`.${name}{animation:${name} ${CYCLE}s linear infinite both;}`);
-  still.push(`.${name}{opacity:${tOut >= ENDS - 0.05 ? hold : 0} !important}`);
-  return name;
-}
-
-/** Fade in, then dim to `to` opacity at `tDim` and stay. */
-function fadeDim(tIn, tDim, to) {
-  const name = `d${uid++}`;
-  css.push(
-    `@keyframes ${name}{0%,${pct(tIn)}{opacity:0}` +
-      `${pct(tIn + 0.5)},${pct(tDim)}{opacity:1}` +
-      `${pct(tDim + 1.1)},${pct(ENDS)}{opacity:${to}}` +
-      `${pct(ENDS + 0.5)},100%{opacity:0}}`,
-  );
-  css.push(`.${name}{animation:${name} ${CYCLE}s linear infinite both;}`);
-  // Deliberately full strength in the still frame rather than the dimmed end
-  // state: with no animation to draw the eye, the pre-compaction window is
-  // half the comparison and needs to stay readable.
-  still.push(`.${name}{opacity:1 !important}`);
-  return name;
-}
-
-/**
- * A gauge that grows through a list of [time, fraction] stops.
- *
- * The final level is held explicitly until the end of the cycle. Without that
- * hold, CSS interpolates straight from the last stop to the reset keyframe and
- * the bar visibly drains back to empty over the rest of the animation.
- */
-function gauge(len, stops, tStart) {
-  const name = `g${uid++}`;
-  const frames = [`0%,${pct(tStart)}{stroke-dashoffset:${len.toFixed(2)}}`];
-  for (const [t, frac] of stops) {
-    frames.push(`${pct(t)}{stroke-dashoffset:${(len * (1 - frac)).toFixed(2)}}`);
-  }
-  const held = len * (1 - stops.at(-1)[1]);
-  frames.push(`${pct(ENDS)}{stroke-dashoffset:${held.toFixed(2)}}`);
-  frames.push(`${pct(ENDS + 0.5)},100%{stroke-dashoffset:${len.toFixed(2)}}`);
-  css.push(`@keyframes ${name}{${frames.join('')}}`);
-  css.push(
-    `.${name}{stroke-dasharray:${len.toFixed(2)};stroke-dashoffset:${len.toFixed(2)};` +
-      `animation:${name} ${CYCLE}s linear infinite both;}`,
-  );
-  still.push(`.${name}{stroke-dashoffset:${held.toFixed(2)} !important}`);
-  return name;
-}
-
-/** Draw a path on, by animating its dash offset. */
-function draw(len, tIn, tOut = ENDS) {
-  const name = `w${uid++}`;
-  css.push(
-    `@keyframes ${name}{0%,${pct(tIn)}{stroke-dashoffset:${len}}` +
-      `${pct(tIn + 1.4)},${pct(tOut)}{stroke-dashoffset:0}` +
-      `${pct(tOut + 0.5)},100%{stroke-dashoffset:${len};opacity:0}}`,
-  );
-  css.push(
-    `.${name}{stroke-dasharray:${len};stroke-dashoffset:${len};` +
-      `animation:${name} ${CYCLE}s linear infinite both;}`,
-  );
-  still.push(`.${name}{stroke-dashoffset:0 !important;opacity:${tOut >= ENDS - 0.05 ? 1 : 0} !important}`);
-  return name;
-}
-
-/** A pulse that runs only between two times. */
-function pulse(tIn, tOut, { from = 1, to = 2.6 } = {}) {
-  const name = `p${uid++}`;
-  const beat = 1.2;
-  const frames = [`0%,${pct(tIn)}{stroke-width:${from};opacity:0}`];
-  let t = tIn;
-  let i = 0;
-  // Every stop is clamped to tOut and the loop stops once a beat would overrun
-  // it. Without the clamp the last beat emitted a percentage past tOut and the
-  // closing frame then went backwards, leaving the keyframes out of order.
-  while (t + beat / 2 < tOut) {
-    frames.push(`${pct(t + beat / 2)}{stroke-width:${to};opacity:0.95}`);
-    frames.push(`${pct(Math.min(t + beat, tOut))}{stroke-width:${from};opacity:0.35}`);
-    t += beat;
-    if (++i > 12) break;
-  }
-  frames.push(`${pct(Math.min(tOut + 0.4, CYCLE))},100%{opacity:0;stroke-width:${from}}`);
-  css.push(`@keyframes ${name}{${frames.join('')}}`);
-  css.push(`.${name}{animation:${name} ${CYCLE}s linear infinite both;}`);
-  still.push(`.${name}{opacity:0 !important}`);
-  return name;
-}
-
-const t = (x, y, s, { size = 12, fill = C.text, anchor = 'start', weight = 400, cls = '', op = 1, ls = 0 } = {}) =>
-  `<text x="${x}" y="${y}" font-size="${size}" fill="${fill}" text-anchor="${anchor}"` +
-  `${weight !== 400 ? ` font-weight="${weight}"` : ''}${op !== 1 ? ` opacity="${op}"` : ''}` +
-  `${ls ? ` letter-spacing="${ls}"` : ''}${cls ? ` class="${cls}"` : ''}>${esc(s)}</text>`;
 
 /** A context block, drawn like the diagram: hatched fill, coloured border. */
 function block(x, y, w, h, label, kind, cls) {
@@ -298,18 +176,7 @@ function block(x, y, w, h, label, kind, cls) {
  * ------------------------------------------------------------------ */
 
 // ---- defs ----
-const patterns = ['blue', 'green', 'orange', 'red']
-  .map((k) => {
-    const fillKey = `${k}Fill`;
-    const hatchKey = `${k}Hatch`;
-    return (
-      `<pattern id="hatch-${k}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">` +
-      `<rect width="7" height="7" fill="${C[fillKey]}"/>` +
-      `<line x1="0" y1="0" x2="0" y2="7" stroke="${C[hatchKey]}" stroke-width="3.2"/>` +
-      `</pattern>`
-    );
-  })
-  .join('');
+const patterns = hatchPatterns();
 
 // ---- header (always visible, so a static render still reads) ----
 body.push(
@@ -610,30 +477,22 @@ body.push(
 /* ------------------------------------------------------------------ *
  * Assemble
  * ------------------------------------------------------------------ */
-const reduced =
-  `@media (prefers-reduced-motion:reduce){*{animation:none !important}` +
-  still.join('') +
-  `}`;
-
-const svg =
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="title desc">` +
-  `<title id="title">Gregory's Awesome Teams — context engineering for the IBM Bob harness</title>` +
-  `<desc id="desc">An animated diagram in three acts. First a Bob context window fills with the system prompt, rules, MCP tools, messages, file reads and tool results until it passes the 190k compaction threshold. Then compaction fires and the older turns collapse into a single conversation summary, losing the middle of the conversation. Finally the kit's features appear: AGENTS.md, four always-on rules, nine skills, references and examples, the Firecrawl MCP server, the slash command, TASKS.md and four setup scripts, together with the build chain discover, grill, spec, implement, evals, demo.</desc>` +
-  `<defs>${patterns}</defs>` +
-  `<style>` +
-  `text{font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Helvetica,Arial,sans-serif}` +
-  css.join('') +
-  reduced +
-  `</style>` +
-  `<rect width="${W}" height="${H}" fill="${C.bg}"/>` +
-  body.join('') +
-  `</svg>\n`;
-
+const svg = assemble({
+  width: W,
+  height: H,
+  title: "Gregory's Awesome Teams — context engineering for the IBM Bob harness",
+  desc:
+    "An animated diagram in three acts. First a Bob context window fills with the system prompt, rules, MCP tools, messages, file reads and tool results until it passes the 190k compaction threshold. Then compaction fires and the older turns collapse into a single conversation summary, losing the middle of the conversation. Finally the kit's features appear: AGENTS.md, four always-on rules, nine skills, references and examples, the Firecrawl MCP server, the slash command, TASKS.md and four setup scripts, together with the build chain discover, grill, spec, implement, evals, demo.",
+  defs: patterns,
+  css,
+  still,
+  body,
+});
 await fs.mkdir(path.dirname(OUT), { recursive: true });
 await fs.writeFile(OUT, svg, 'utf8');
 
 console.log(`wrote ${path.relative(process.cwd(), OUT)}`);
-console.log(`  ${(svg.length / 1024).toFixed(1)} KB, ${uid} animated elements`);
+console.log(`  ${(svg.length / 1024).toFixed(1)} KB, ${tl.count} animated elements, ${CYCLE}s loop`);
 console.log(`  ${SKILL_COUNT} skills, ${RULE_COUNT} rules, ${COVERAGE_GATE}% gate (read from the payload)`);
 console.log(`  left window total  ${leftTotal.toLocaleString('en-US')} tokens`);
 console.log(`  right window total ${rightTotal.toLocaleString('en-US')} tokens`);

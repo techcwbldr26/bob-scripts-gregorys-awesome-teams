@@ -1,5 +1,7 @@
 # The Build Flow
 
+![An animated diagram of the six build stages. Each stage lights up in turn and shows the skill that runs it, the failure it prevents, the file it leaves behind and the signal that it worked. An arc from implement back to spec shows that going backwards is the process working, and the artefacts accumulate along the bottom as an inventory for demo day.](https://raw.githubusercontent.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/main/assets/build-flow.svg)
+
 ```
 discover → grill → spec → implement → evals → demo rehearsal
 ```

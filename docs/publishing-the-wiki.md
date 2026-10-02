@@ -65,3 +65,17 @@ publish would overwrite them.
 Files beginning with `_` are special to GitHub wikis: `_Sidebar.md` and
 `_Footer.md` render on every page. Everything else becomes a page whose title is
 the filename with hyphens turned into spaces.
+
+## The images
+
+`The-Build-Flow.md` and `Skills-Reference.md` open with an animated SVG. Those
+images are **not** copied into the wiki repository: the pages link to them by
+absolute `raw.githubusercontent.com` URL on `main`, because a wiki page cannot
+reach a file in the code repository by relative path.
+
+Two consequences worth knowing:
+
+- Rebuilding a diagram and merging it to `main` updates the wiki immediately.
+  There is nothing to re-publish for an image-only change.
+- The URLs pin `main`, not a tag. A page published from a branch still shows
+  whatever `main` currently has.
