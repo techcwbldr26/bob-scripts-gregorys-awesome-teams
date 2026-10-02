@@ -1,7 +1,116 @@
 # Context Engineering
 
-What the model can see while you talk to it. The thing that silently decides
-whether a long session stays good or quietly falls apart.
+> Context engineering is **the set of strategies for curating and maintaining
+> the optimal set of tokens (information) during LLM inference**, including all
+> the other information that may land there outside of the prompts.
+>
+> — Anthropic, [Effective context engineering for AI
+> agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents),
+> 29 September 2025 (updated 6 January 2026)
+
+Prompt engineering is how you write one instruction. Context engineering is
+managing **everything in the window** — system prompt, rules, skills, tool
+definitions, files you read, tool results, and the whole message history —
+across a session that may run for hours.
+
+Cognition's line, quoted by LangChain, is not an exaggeration: context
+engineering *"is effectively the #1 job of engineers building AI agents."*
+(LangChain, [Context Engineering](https://www.langchain.com/blog/context-engineering-for-agents), 2 July 2025.)
+
+---
+
+## The part nobody expects: accuracy falls *before* you run out of room
+
+Students assume the context window is a bucket. Fill it and you get an error;
+stay under the line and you are fine.
+
+That is not how it behaves. Anthropic calls the real effect **context rot**: as
+the number of tokens grows, the model's ability to accurately recall information
+from that context *decreases*. Not at the limit — gradually, all the way up.
+
+The reason is architectural, and worth knowing because it tells you the problem
+will not be fixed by a bigger window:
+
+> Every token attends to every other token across the entire context, resulting
+> in n² pairwise relationships for n tokens. As context length increases, the
+> model's ability to capture these pairwise relationships gets stretched thin.
+
+Models are also trained on far more short sequences than long ones, so they have
+less practice at long-range dependencies. The practical consequence:
+
+**Treat context as a finite resource with diminishing returns.** Every token you
+add is spent from an attention budget, and the tokens you add late compete with
+the ones that mattered at the start — including the instruction you gave in
+turn one.
+
+This is why a session that is "only" at 120k can already be worse than it was at
+30k, and why the fix is never "say it again, louder".
+
+---
+
+## The one principle
+
+> Find the smallest possible set of high-signal tokens that maximize the
+> likelihood of some desired outcome.
+>
+> — Anthropic, *Effective context engineering for AI agents*
+
+Memorise that sentence. It is the entire discipline, and it settles almost every
+argument you will have about what to put in `AGENTS.md`, how many MCP servers to
+install, and whether to paste the whole file or a line range.
+
+Note what it does **not** say. Not "the fewest tokens" — an under-specified
+agent fails too. **Smallest set of *high-signal* tokens.** You are maximising
+signal per token, not minimising tokens.
+
+---
+
+## The four moves
+
+LangChain groups every context technique into four categories ([Context Engineering](https://www.langchain.com/blog/context-engineering-for-agents)).
+Each one has a concrete form in your project:
+
+| Move | What it means | What you actually do |
+| --- | --- | --- |
+| **Write** | save context *outside* the window | `TASKS.md`, `GLOSSARY.md`, `references/evidence.md`, ADRs |
+| **Select** | pull in only what this task needs | read a line range, not a file; one skill, not nine |
+| **Compress** | keep only the tokens the task requires | summarise before `/clear`; let compaction run on your terms |
+| **Isolate** | split context so pieces stay clean | a subagent for a wide search; a fresh session per stage |
+
+Anthropic names the same moves as techniques, and the mapping is direct:
+
+- **Just-in-time retrieval** — hold lightweight identifiers (file paths, URLs,
+  IDs) and load the content at the moment you need it, instead of pre-loading
+  everything up front. This is *select*, and it is what `$discover-with-firecrawl`
+  is doing when it stores URLs rather than pasted pages.
+- **Compaction** — summarise a conversation near the limit and restart from the
+  summary. Bob does this for you at ~190k, which is *compress* happening whether
+  you planned it or not.
+- **Structured note-taking** — the agent writes notes to a file outside the
+  window and pulls them back later. That is `TASKS.md`. It is the single
+  cheapest habit on this page, and it is *write*.
+- **Sub-agents** — a specialist works in a clean window and returns a condensed
+  summary, so the exploration never enters your main context. That is *isolate*.
+
+**The goal is not to survive compaction. It is to never need it.**
+
+---
+
+## Where the model's own instructions sit
+
+Two details from the same Anthropic piece that change how you write
+`AGENTS.md` and your rules:
+
+- **Altitude.** A system prompt should sit in the "Goldilocks zone" between
+  brittle hardcoded if-else logic and vague high-level guidance — *specific
+  enough to guide behaviour, flexible enough to leave the model strong
+  heuristics*. Rules that enumerate every edge case age badly; rules that say
+  "be good" do nothing.
+- **Tools are context too.** Every tool definition is paid for on every turn,
+  and overlapping tools make the agent worse, not more capable. Anthropic's
+  test: *"If a human engineer can't definitively say which tool should be used
+  in a given situation, an AI agent can't be expected to do better."* Install
+  the MCP servers you use. Uninstall the rest.
 
 ---
 
