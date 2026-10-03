@@ -81,7 +81,7 @@ Bob finishes by running a check. Every line should say `ok`:
   ok   SKILLS.md                    present
   ok   /gregorys-awesome-teams command installed
   ok   /improve-prompt command      installed
-  ok   skills                       9 skills valid
+  ok   skills                       10 skills valid
   ok   rules                        4 rule files in .bob/rules
   ok   Firecrawl MCP                registered over streamable-http
   ok   examples/                    7 files
@@ -120,7 +120,7 @@ this semester, and it is only avoidable at the start.
 | What | Why it is there |
 | --- | --- |
 | `AGENTS.md` | Rules Bob reads every single turn. Short on purpose |
-| `SKILLS.md` | A list of the nine skills you now have |
+| `SKILLS.md` | A list of the ten skills you now have |
 | `.bob/` | The machinery: skills, rules, the slash command, the Firecrawl connection |
 | `examples/` | Worked examples to copy — a real spec, a real ADR, a real eval case |
 | `references/` | The deep material, which Bob reads only when it needs it |

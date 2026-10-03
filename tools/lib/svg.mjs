@@ -214,22 +214,83 @@ export function timeline({ design, ends, cycle = CYCLE }) {
  *
  * SVG has no text flow, so every line is its own `<text>` and the break points
  * have to be decided here. `max` is a character budget, not pixels: pick it
- * from the font size and the box width (a sans-serif averages a bit under half
- * its point size per character).
+ * from the font size and the box width (see `CHAR_RATIO`).
+ *
+ * A single word longer than `max` is split rather than left to overflow its
+ * box. `references/evidence.md` is one word to a naive wrapper, and it ran off
+ * the end of its card on the published diagram until this existed. The split
+ * prefers a path or hyphen boundary so the break reads as deliberate.
  */
 export function wrap(s, max) {
   const lines = [];
   let line = '';
+  const push = () => {
+    if (line) lines.push(line);
+    line = '';
+  };
   for (const word of String(s).split(/\s+/).filter(Boolean)) {
-    if (!line) line = word;
-    else if (line.length + 1 + word.length <= max) line += ` ${word}`;
-    else {
-      lines.push(line);
-      line = word;
+    for (const piece of splitLongWord(word, max)) {
+      if (!line) line = piece;
+      else if (line.length + 1 + piece.length <= max) line += ` ${piece}`;
+      else {
+        push();
+        line = piece;
+      }
     }
   }
-  if (line) lines.push(line);
+  push();
   return lines;
+}
+
+/** Break one over-long word, preferring a path separator, then a hyphen. */
+function splitLongWord(word, max) {
+  if (word.length <= max) return [word];
+  const out = [];
+  let rest = word;
+  while (rest.length > max) {
+    // Keep the separator on the end of the first part, so the break reads as
+    // "references/" + "evidence.md" rather than losing the slash. A path
+    // separator wins over a hyphen: "docs/" + "demo-script.md" beats
+    // "docs/demo-" + "script.md".
+    const slash = rest.lastIndexOf('/', max);
+    const boundary = slash > 0 ? slash : rest.lastIndexOf('-', max);
+    const cut = boundary > 0 ? boundary + 1 : max;
+    out.push(rest.slice(0, cut));
+    rest = rest.slice(cut);
+  }
+  if (rest) out.push(rest);
+  return out;
+}
+
+/**
+ * How wide a character is, as a fraction of the font size, for the project's
+ * sans-serif.
+ *
+ * Measured with `getComputedTextLength` in the browser, not estimated: a
+ * guessed 0.52 predicted 110px for a string that renders at 130px, which is how
+ * `references/evidence.md` came to hang out of its card on the published
+ * diagram. Semibold text and lowercase paths sit near 0.62; regular body text
+ * nearer 0.55.
+ */
+export const CHAR_RATIO = { bold: 0.62, regular: 0.55 };
+
+/** Characters that fit `width` pixels at `size`, for use as a wrap budget. */
+export function charBudget(width, size, ratio = CHAR_RATIO.bold) {
+  return Math.max(4, Math.floor(width / (size * ratio)));
+}
+
+/**
+ * The largest font size at which every line fits `width` pixels, capped at
+ * `size`.
+ *
+ * The character budget passed to `wrap` is an estimate, so it is possible to
+ * get a line that is one or two characters too wide for its box. This is the
+ * backstop that makes an overflow impossible rather than unlikely.
+ */
+export function fitSize(lines, width, size, { min = 6.5, ratio = CHAR_RATIO.bold } = {}) {
+  const longest = lines.reduce((n, l) => Math.max(n, l.length), 0);
+  if (!longest) return size;
+  return Math.max(min, Math.min(size, width / (longest * ratio)));
 }
 
 /** A `<text>` element with the project's defaults. */

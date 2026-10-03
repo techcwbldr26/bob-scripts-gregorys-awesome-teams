@@ -66,7 +66,7 @@ Also loaded every turn. Things that must *always* apply.
 **Skill** (`.bob/skills/<name>/SKILL.md`)
 A set of instructions for one kind of task. The clever part: only the skill's
 one-line *description* sits in context. The body loads when Bob decides it
-applies. That is why you can have nine of them for almost no cost.
+applies. That is why you can have ten of them for almost no cost.
 
 **Slash command** (`.bob/commands/<name>.md`)
 Something you type starting with `/`. Yours is `/gregorys-awesome-teams`.

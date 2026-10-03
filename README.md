@@ -1,6 +1,6 @@
 <p align="center">
   <img src="assets/banner.svg"
-       alt="Animated diagram in three acts. A Bob context window fills with the system prompt, rules, MCP tools, messages, file reads and tool results until it passes the 190k compaction threshold at 193k. Compaction then collapses the older turns into a single conversation summary, leaving 12.3k and losing the middle of the conversation. Finally the kit's features appear: AGENTS.md, four always-on rules, nine skills, references and examples, the Firecrawl MCP server, the slash command, TASKS.md and four setup scripts, with the same session rerun at 38k and the build chain discover, grill, spec, implement, evals, demo."
+       alt="Animated diagram in three acts. A Bob context window fills with the system prompt, rules, MCP tools, messages, file reads and tool results until it passes the 190k compaction threshold at 193k. Compaction then collapses the older turns into a single conversation summary, leaving 12.3k and losing the middle of the conversation. Finally the kit's features appear: AGENTS.md, four always-on rules, ten skills, references and examples, the Firecrawl MCP server, the slash commands, TASKS.md and four setup scripts, with the same session rerun at 38k and the build chain discover, grill, spec, implement, evals, demo."
        width="900">
 </p>
 
@@ -80,12 +80,12 @@ your-project/
 │   │   ├── gregorys-awesome-teams.md    Routes an idea into the build flow
 │   │   └── improve-prompt.md            Rewrites a rough prompt, and explains it
 │   ├── rules/                  Four always-on rules
-│   └── skills/                 Nine skills, loaded on demand
+│   └── skills/                 Ten skills, loaded on demand
 ├── examples/                   Worked artefacts to copy
 └── references/                 Depth Bob reads only when a skill cites it
 ```
 
-### The nine skills
+### The ten skills
 
 | Skill | What it does |
 | --- | --- |
@@ -98,9 +98,19 @@ your-project/
 | `$wizard` | Generate a setup script for whatever a human must click through |
 | `$rag-architecture` | Turn "we'll use RAG" into real chunking and retrieval decisions |
 | `$harness-tuning` | Diagnose Bob itself when it is the thing misbehaving |
+| `$improve-prompt` | Rewrite a rough prompt and show what changed, so you learn the shape |
 
 `$grill-with-docs` and `$wizard` are adaptations of Matt Pocock's skills of the
 same names (MIT). See [NOTICE.md](NOTICE.md).
+
+**All of it on one page:** [CHEATSHEET.md](CHEATSHEET.md) — the commands, the ten
+skills, the four rules and the numbers. Generated from the kit, so it cannot go
+stale.
+
+**`$improve-prompt` also ships standalone.**
+[`improve-prompt-kit/`](improve-prompt-kit/) carries its own `AGENTS.md`,
+`SKILL.md`, examples and references. It is markdown and nothing else, so it drops
+into any harness or IDE — or paste its `PROMPT.md` into a plain chat window.
 
 ### The build chain
 

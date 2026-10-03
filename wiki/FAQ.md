@@ -25,7 +25,7 @@ Yes. Commit the whole `.bob/` folder. Each person sets their own Firecrawl key
 with `/manage-secrets`, which is why `.bob/mcp.json` is safe to commit — it only
 contains `${FIRECRAWL_API_KEY}`, never the key itself.
 
-### Do I have to use all nine skills?
+### Do I have to use all ten skills?
 No. Use what the work needs. `$discover-with-firecrawl` and `$build-evals` are
 the two most teams wrongly skip.
 

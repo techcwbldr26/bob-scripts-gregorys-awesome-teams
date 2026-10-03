@@ -1,8 +1,8 @@
 # Skills Reference
 
-![An animated diagram of the nine skills. Each card shows one skill’s one-line description and what its body would cost, and a running readout counts the descriptions up to roughly 600 tokens. A stacked bar then compares what you actually pay in the context window — Bob’s baseline plus that sliver, plus one body while it runs — against what it would cost if all nine bodies were loaded on every turn.](https://raw.githubusercontent.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/main/assets/skills.svg)
+![An animated diagram of the ten skills. Each card shows one skill’s one-line description and what its body would cost, and a running readout counts the descriptions up to roughly 665 tokens. A stacked bar then compares what you actually pay in the context window — Bob’s baseline plus that sliver, plus one body while it runs — against what it would cost if all ten bodies were loaded on every turn.](https://raw.githubusercontent.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/main/assets/skills.svg)
 
-Nine skills. Type `$` in Bob to pick from a list, `$skill-name` to invoke one
+Ten skills. Type `$` in Bob to pick from a list, `$skill-name` to invoke one
 directly, or just describe what you need and Bob will reach for the right one.
 
 Only each skill's one-line description sits in context. The body loads on demand,
@@ -96,6 +96,35 @@ See [Demo Day](Demo-Day).
 ---
 
 ## The ones you reach for when they apply
+
+### `$improve-prompt`
+> Rewrite a rough prompt into a well-structured one and show what changed, so
+> the person learns the shape rather than just receiving a better prompt.
+
+**Reach for it:** any time you are not sure how to word a request — and in week
+one, on a few prompts you have already sent, to see the structure.
+
+Also available as `/improve-prompt <your rough wording>`, which is usually
+easier to type.
+
+**It produces:** the improved prompt, a table of what changed, the parts that
+belong in your harness rather than your prompt, and what that saves in the
+context window.
+
+**It is working when** it leaves a `[FILL: …]` blank. It never invents your
+acceptance criteria — only you know what "done" means — so a blank is the skill
+working, not failing.
+
+**It rewrites; it does not run the task.** `/improve-prompt build me a login
+system` gives you a better prompt for building a login system.
+
+> This one is also published as a standalone kit in
+> [`improve-prompt-kit/`](https://github.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/tree/main/improve-prompt-kit),
+> with its own `AGENTS.md`, `SKILL.md`, examples and references. It is markdown
+> and nothing else, so it drops into any harness or IDE — or paste `PROMPT.md`
+> into a plain chat window.
+
+---
 
 ### `$wizard`
 > Generate an interactive setup script that walks a human through a manual

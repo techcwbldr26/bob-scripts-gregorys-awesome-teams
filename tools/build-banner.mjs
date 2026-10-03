@@ -482,7 +482,14 @@ const svg = assemble({
   height: H,
   title: "Gregory's Awesome Teams — context engineering for the IBM Bob harness",
   desc:
-    "An animated diagram in three acts. First a Bob context window fills with the system prompt, rules, MCP tools, messages, file reads and tool results until it passes the 190k compaction threshold. Then compaction fires and the older turns collapse into a single conversation summary, losing the middle of the conversation. Finally the kit's features appear: AGENTS.md, four always-on rules, nine skills, references and examples, the Firecrawl MCP server, the slash command, TASKS.md and four setup scripts, together with the build chain discover, grill, spec, implement, evals, demo.",
+    'An animated diagram in three acts. First a Bob context window fills with the system ' +
+    'prompt, rules, MCP tools, messages, file reads and tool results until it passes the ' +
+    '190k compaction threshold. Then compaction fires and the older turns collapse into a ' +
+    "single conversation summary, losing the middle of the conversation. Finally the kit's " +
+    `features appear: AGENTS.md, ${RULE_COUNT} always-on rules, ${SKILL_COUNT} skills, ` +
+    'references and examples, the Firecrawl MCP server, the slash commands, TASKS.md and ' +
+    'four setup scripts, together with the build chain discover, grill, spec, implement, ' +
+    'evals, demo.',
   defs: patterns,
   css,
   still,

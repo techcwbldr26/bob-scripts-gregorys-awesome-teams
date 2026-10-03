@@ -20,9 +20,12 @@ import { fileURLToPath } from 'node:url';
 import { COVERAGE_GATE } from '../src/payload.mjs';
 import {
   C,
+  CHAR_RATIO,
   CYCLE,
   STROKE,
   assemble,
+  charBudget,
+  fitSize,
   hatchPatterns,
   text as t,
   timeline,
@@ -95,7 +98,7 @@ const STAGES = [
     skill: '$demo-rehearsal',
     stops: 'the failure that only happens in front of the audience',
     produces: 'docs/demo-script.md  ·  docs/demo-qa.md',
-    ledger: 'a rehearsed recovery for each way it can break',
+    ledger: 'a rehearsed recovery for every failure',
     right: 'it ran from a clean checkout on a different machine',
   },
 ];
@@ -128,7 +131,6 @@ const body = [];
  * Geometry
  * ------------------------------------------------------------------ */
 const W = 1000;
-const H = 604;
 
 const PILL_W = 126;
 const PILL_H = 54;
@@ -140,7 +142,60 @@ const cx = (i) => px(i) + PILL_W / 2;
 const RAIL_Y = PILL_Y + PILL_H / 2;
 
 const PANEL = { x: 30, y: 252, w: 940, h: 152 };
-const CARD = { y: 450, h: 72 };
+/**
+ * Card text, measured before anything is laid out.
+ *
+ * The budgets come from the card's real inner width and the rendered size is
+ * clamped to it, because an artefact name is a single unbreakable word to a
+ * wrapper — `references/evidence.md` hung out of its card on the published
+ * diagram until this existed. The card's height then follows from the lines,
+ * so fixing the horizontal overflow cannot quietly create a vertical one.
+ */
+const CARD_PAD = { left: 11, right: 6 };
+const CARD_TEXT_W = PILL_W - CARD_PAD.left - CARD_PAD.right;
+const NAME_SIZE = 9.6;
+const SUB_SIZE = 8.8;
+const NAME_STEP = 11.5;
+const SUB_STEP = 10.5;
+
+const ledger = STAGES.map((s) => {
+  const lines = s.produces
+    .split('·')
+    .flatMap((part) => wrap(part.trim(), charBudget(CARD_TEXT_W, NAME_SIZE)));
+  const sub = wrap(s.ledger, charBudget(CARD_TEXT_W, SUB_SIZE, CHAR_RATIO.regular));
+  return {
+    lines,
+    sub,
+    nameSize: Number(fitSize(lines, CARD_TEXT_W, NAME_SIZE).toFixed(2)),
+    subSize: Number(fitSize(sub, CARD_TEXT_W, SUB_SIZE, { ratio: CHAR_RATIO.regular }).toFixed(2)),
+    // Baseline of the last line, plus room for its descender.
+    bottom: 20 + lines.length * NAME_STEP + (sub.length - 1) * SUB_STEP + 4,
+  };
+});
+
+const CARD = { y: 450, h: Math.ceil(Math.max(...ledger.map((c) => c.bottom)) + 6) };
+
+// Everything below the cards hangs off their height, so a longer artefact name
+// moves the footer rather than being drawn over it.
+const RULE_Y = CARD.y + CARD.h + 18;
+const FOOTER_Y = RULE_Y + 52;
+const H = FOOTER_Y + 12;
+
+/** Refuse to emit a diagram whose text does not fit its box. */
+for (const [i, card] of ledger.entries()) {
+  for (const [line, size, ratio] of [
+    ...card.lines.map((l) => [l, card.nameSize, CHAR_RATIO.bold]),
+    ...card.sub.map((l) => [l, card.subSize, CHAR_RATIO.regular]),
+  ]) {
+    const width = line.length * size * ratio;
+    if (width > CARD_TEXT_W + 0.5) {
+      throw new Error(
+        `build-flow: "${line}" is ~${width.toFixed(0)}px wide in a ${CARD_TEXT_W}px card ` +
+          `(stage ${i + 1}, ${STAGES[i].name})`,
+      );
+    }
+  }
+}
 
 /* ------------------------------------------------------------------ *
  * Header — unanimated, so a static render still reads.
@@ -299,25 +354,32 @@ body.push(
     `</g>`,
 );
 
+// Text budgets come from the card's real inner width, and the rendered size is
+// then clamped to it. An artefact name is one unbreakable word to a wrapper —
+// `references/evidence.md` hung out of its card on the published diagram until
+// both of these existed.
 STAGES.forEach((s, i) => {
   const x = px(i);
-  const lines = s.produces.split('·').flatMap((part) => wrap(part.trim(), 21));
-  const sub = wrap(s.ledger, 23);
+  const card = ledger[i];
   body.push(
     `<g class="${fade(at(i) + 2.2, ENDS, { rise: 9 })}">` +
       `<rect x="${x}" y="${CARD.y}" width="${PILL_W}" height="${CARD.h}" rx="8"` +
       ` fill="${C.panelAlt}" stroke="${STROKE[s.kind]}" stroke-width="1.2"/>` +
       `<rect x="${x + 1}" y="${CARD.y + 8}" width="3.5" height="${CARD.h - 16}" rx="1.8"` +
       ` fill="${STROKE[s.kind]}"/>` +
-      lines
+      card.lines
         .map((l, n) =>
-          t(x + 11, CARD.y + 17 + n * 11.5, l, { size: 9.6, fill: C.white, weight: 600 }),
+          t(x + CARD_PAD.left, CARD.y + 17 + n * NAME_STEP, l, {
+            size: card.nameSize,
+            fill: C.white,
+            weight: 600,
+          }),
         )
         .join('') +
-      sub
+      card.sub
         .map((l, n) =>
-          t(x + 11, CARD.y + 20 + lines.length * 11.5 + n * 10.5, l, {
-            size: 8.8,
+          t(x + CARD_PAD.left, CARD.y + 20 + card.lines.length * NAME_STEP + n * SUB_STEP, l, {
+            size: card.subSize,
             fill: C.muted,
           }),
         )
@@ -335,9 +397,9 @@ STAGES.forEach((s, i) => {
   const x = (W - w) / 2;
   body.push(
     `<g class="${fade(LAST + 2.0, ENDS, { rise: 6 })}">` +
-      `<rect x="${x}" y="540" width="${w}" height="30" rx="15" fill="${C.panel}"` +
+      `<rect x="${x}" y="${RULE_Y}" width="${w}" height="30" rx="15" fill="${C.panel}"` +
       ` stroke="${C.blue}" stroke-width="1.2"/>` +
-      t(W / 2, 560, label, { size: 12, anchor: 'middle', fill: C.text }) +
+      t(W / 2, RULE_Y + 20, label, { size: 12, anchor: 'middle', fill: C.text }) +
       `</g>`,
   );
 }
@@ -345,7 +407,7 @@ STAGES.forEach((s, i) => {
 body.push(
   t(
     W / 2,
-    592,
+    FOOTER_Y,
     '/gregorys-awesome-teams works out which stage you are on   ·   going backwards is fine   ·   skipping evals is not',
     { size: 10.5, anchor: 'middle', fill: C.faint, ls: 0.4 },
   ),
