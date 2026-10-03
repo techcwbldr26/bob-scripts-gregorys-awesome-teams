@@ -103,8 +103,9 @@ Call the folder from step 4 <kit>:
   Mac, Intel:          <kit>/scripts/install-macos-intel.sh --target "<this folder>"
   Linux:               <kit>/scripts/install-linux.sh --target "<this folder>"
   Windows PowerShell:  <kit>\scripts\install-windows.ps1 -Target "<this folder>"
-Show me the output. It should finish by listing 10 skills. If I picked the wrong
-Mac script, it will refuse and name the right one, so just run that instead.
+Show me the output. It should say "Skills installed (10)" and then list them. If
+I picked the wrong Mac script, it will refuse and name the right one, so just run
+that instead.
 Running it twice is safe: the second run says "already current".
 
 Step 6. Make sure my key can never be committed.
@@ -162,6 +163,9 @@ In plain language, tell me:
 - that if I am ever unsure how to word a request, I can type /improve-prompt
   followed by my rough wording, and it will rewrite the prompt and show me what
   it changed, without doing the task
+- that there is a one-page cheat sheet listing every command and skill at
+  https://github.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/wiki/Cheat-Sheet
+  and it is worth keeping open in a browser tab
 Then stop. Do not start building my project yet.
 
 RULES THROUGHOUT
@@ -200,6 +204,9 @@ template, and say which of the twelve steps you were on.
 Once it finishes, see [the README](README.md) for what each piece does, and
 [docs/student-quickstart.md](docs/student-quickstart.md) for the longer tour.
 
-The short version: Bob now loads your project's rules on every turn, has nine
+The short version: Bob now loads your project's rules on every turn, has ten
 skills it can reach for, can search the real web through Firecrawl instead of
 guessing from memory, and knows that your demo is on December 1st, 2026.
+
+Keep the [cheat sheet](https://github.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/wiki/Cheat-Sheet)
+open in a tab while you work — one page, every command and skill.

@@ -12,6 +12,7 @@ import {
   DEMO_DATE,
   FIRECRAWL_KEYS_URL,
   FIRECRAWL_SIGNUP_URL,
+  IMPROVE_COMMAND_NAME,
 } from './constants.mjs';
 import { install, summarize } from './install.mjs';
 import { checkNode, detectPlatform, platformLabel } from './platform.mjs';
@@ -134,6 +135,10 @@ export function formatReport(result, { platform, node } = {}) {
     for (const step of manualFollowUps({ mcpMode: result.mcpMode })) lines.push(`  ${step}`);
     lines.push('');
     lines.push(`Then type /${COMMAND_NAME} in Bob and describe your idea.`);
+    lines.push(
+      `Not sure how to word something? /${IMPROVE_COMMAND_NAME} rewrites a rough prompt` +
+        ' and shows you what it changed.',
+    );
     lines.push(`Demo day: ${DEMO_DATE}.`);
   }
 

@@ -171,7 +171,19 @@ not to survive it — it is to never need it.
 | You do not know how to word a request | \`/${IMPROVE_COMMAND_NAME}\` followed by your rough wording |
 | You do not know what to do next | \`/${COMMAND_NAME}\` with no argument tells you where you are |
 
-Run \`npx gat-install --verify\` to check the installation. Every line should say \`ok\`.
+To re-check the installation, run the setup script for your machine again with
+the verify flag — the same script you installed with, from wherever you cloned
+the kit:
+
+\`\`\`bash
+<kit>/scripts/install-linux.sh --target "$(pwd)" --verify     # or -macos-intel / -macos-apple-silicon
+\`\`\`
+
+\`\`\`powershell
+<kit>\\scripts\\install-windows.ps1 -Target "$PWD" -Verify
+\`\`\`
+
+Every line should say \`ok\`.
 `;
 
 for (const out of OUT) {
