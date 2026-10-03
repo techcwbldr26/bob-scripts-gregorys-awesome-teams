@@ -314,8 +314,14 @@ export function text(
  * these through a sanitiser and anything clever silently stops working.
  */
 export function assemble({ width, height, title, desc, defs = '', css, still, body }) {
-  const reduced =
-    `@media (prefers-reduced-motion:reduce){*{animation:none !important}` + still.join('') + `}`;
+  // A diagram with no timeline needs no reduced-motion block. Emitting one
+  // anyway left `animation:none !important` in a card that has nothing to
+  // animate — dead CSS, and enough to make "is this static?" unanswerable by
+  // reading the file.
+  const animated = css.length > 0 || still.length > 0;
+  const reduced = animated
+    ? `@media (prefers-reduced-motion:reduce){*{animation:none !important}` + still.join('') + `}`
+    : '';
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}"` +
     ` width="${width}" height="${height}" role="img" aria-labelledby="title desc">` +
