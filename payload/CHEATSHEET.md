@@ -3,7 +3,7 @@
 One page. Everything you type, and everything that can run.
 Generated from the kit itself — if it is on this page, it is installed.
 
-**10 skills · 2 commands · 4 always-on rules · demo day December 1st, 2026**
+**10 skills · 2 commands · 4 always-on rules · demo day December 2026**
 
 ---
 
@@ -78,7 +78,7 @@ These are not skills. They load on **every** turn, which is why they are short.
 | Compaction starts around | **190,000** tokens |
 | Reserved for the reply | about 20,000, not counted in the used total |
 | Coverage gate | **90%** lines |
-| Demo day | **December 1st, 2026** |
+| Demo day | **December 2026** |
 
 Compaction is lossy: it summarises away decisions you made early. The goal is
 not to survive it — it is to never need it.

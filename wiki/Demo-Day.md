@@ -1,9 +1,10 @@
 # Demo Day
 
-**December 1st, 2026.** Live, in front of an audience.
+**December 2026.** Gregory's teams will demo their projects.
 
-Read this in week one, not week eleven. Several things on it are cheap now and
-expensive later.
+Read this as soon as possible. This knowledge will put you ahead of the pack.
+Gregory's goal is to have his teams ready to deliver enterprise-class,
+production-ready projects.
 
 ---
 

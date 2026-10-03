@@ -203,8 +203,105 @@ describe('the diagrams are wired into the build', () => {
     assert.equal(pkg.scripts['build:flow'], 'node tools/build-flow-diagram.mjs');
     assert.equal(pkg.scripts['build:skills'], 'node tools/build-skills-diagram.mjs');
     assert.equal(pkg.scripts['build:chain'], 'node tools/build-chain-diagram.mjs');
+    assert.equal(pkg.scripts['build:security'], 'node tools/build-security-diagram.mjs');
+    assert.equal(pkg.scripts['build:layers'], 'node tools/build-layers-diagram.mjs');
     assert.equal(pkg.scripts['build:kit'], 'node tools/build-improve-prompt-kit.mjs');
     assert.ok(pkg.scripts['build:svg'], 'one script should rebuild all three');
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Enterprise security safeguards
+ * ------------------------------------------------------------------ */
+const security = describeGeneratedSvg({
+  label: 'the safeguards diagram',
+  asset: 'assets/security-safeguards.svg',
+  generator: 'tools/build-security-diagram.mjs',
+  minClasses: 40,
+  maxKB: 80,
+});
+
+const layers = describeGeneratedSvg({
+  label: 'the five-layer diagram',
+  asset: 'assets/five-layers.svg',
+  generator: 'tools/build-layers-diagram.mjs',
+  minClasses: 15,
+  maxKB: 80,
+});
+
+describe('the security diagrams agree with their page', () => {
+  const page = () => wikiPage('Enterprise-Security-Safeguards');
+
+  it('names all six safeguards on the diagram and on the page', async () => {
+    const svg = await security.svg();
+    const text = await page();
+    for (const name of [
+      'Limit access',
+      'Restrict permissions',
+      'Separate trusted',
+      'high-impact',
+      'Control data movement',
+      'Log and monitor',
+    ]) {
+      assert.ok(svg.includes(name), `the diagram should name "${name}"`);
+    }
+    for (const heading of [
+      'Limit what the agent can access',
+      'Restrict permissions',
+      'Separate trusted commands from untrusted content',
+      'Keep humans in the loop for high-impact actions',
+      'Control how data moves between systems',
+      'Log and monitor what the agent does',
+    ]) {
+      assert.ok(text.includes(heading), `the page should cover "${heading}"`);
+    }
+  });
+
+  it('names all five layers, in build order', async () => {
+    const svg = await layers.svg();
+    let at = -1;
+    for (const layer of ['Business case', 'Workflow', 'Access', 'Governance and security', 'Measurement']) {
+      const next = svg.indexOf(`>${layer}<`, at + 1);
+      assert.notEqual(next, -1, `the diagram should name "${layer}"`);
+      at = next;
+    }
+  });
+
+  it('keeps the point that security is not the fourth step', async () => {
+    assert.match(await layers.svg(), /Security is not the fourth step/);
+    assert.match(await page(), /Security is not a step you reach/);
+  });
+
+  it('embeds the banner at the top and the layers in the middle', async () => {
+    const text = await page();
+    assert.ok(text.trimStart().split('\n')[0].startsWith('# '), 'the page opens with its heading');
+    const bannerAt = text.indexOf(`${RAW}/security-safeguards.svg`);
+    const layersAt = text.indexOf(`${RAW}/five-layers.svg`);
+    assert.notEqual(bannerAt, -1, 'the banner should be embedded');
+    assert.notEqual(layersAt, -1, 'the layers diagram should be embedded');
+    assert.ok(bannerAt < 900, 'the banner belongs at the top');
+    assert.ok(layersAt > text.length / 3, 'the layers diagram belongs in the middle, not the top');
+    for (const alt of text.matchAll(/!\[([^\]]*)\]/g)) {
+      assert.ok(alt[1].length > 60, 'every embed needs alt text, not a filename');
+    }
+  });
+
+  it('is reachable from the sidebar and from Home', async () => {
+    for (const name of ['_Sidebar', 'Home']) {
+      assert.match(
+        await wikiPage(name),
+        /\(Enterprise-Security-Safeguards\)/,
+        `${name} should link to the page`,
+      );
+    }
+  });
+
+  it('does not invent an author or a link for the source article', async () => {
+    // The supplied file carried no byline and no URL, so the page credits it as
+    // supplied rather than fabricating a citation.
+    const text = await page();
+    assert.match(text, /supplied by Gregory/);
+    assert.doesNotMatch(text.split('*Adapted for this handbook')[1] ?? '', /https?:\/\//);
   });
 });
 

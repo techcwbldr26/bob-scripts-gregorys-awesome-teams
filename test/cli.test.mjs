@@ -11,7 +11,7 @@ import {
   main,
   parseArgs,
 } from '../src/cli.mjs';
-import { BOB_PATHS } from '../src/constants.mjs';
+import { BOB_PATHS, DEMO_DATE } from '../src/constants.mjs';
 import { captureIo, cleanup, exists, tempDir, write } from './helpers.mjs';
 
 after(cleanup);
@@ -123,7 +123,7 @@ describe('formatReport', () => {
   it('shows next steps and the demo date on success', () => {
     const text = formatReport({ ...base, results: [], skills: [] }).join('\n');
     assert.match(text, /manage-secrets set/);
-    assert.match(text, /Demo day: December 1st, 2026/);
+    assert.match(text, new RegExp(`Demo day: ${DEMO_DATE}`));
   });
 
   it('omits next steps on a dry run', () => {

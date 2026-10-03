@@ -15,6 +15,7 @@
 - [Prompt Engineering](Prompt-Engineering)
 - [Context Engineering](Context-Engineering)
 - [Harness Engineering](Harness-Engineering)
+- [Enterprise Security Safeguards](Enterprise-Security-Safeguards)
 - [Testing and Evals](Testing-and-Evals)
 
 **Ship**
@@ -22,4 +23,4 @@
 - [FAQ](FAQ)
 
 ---
-**Demo: 1 Dec 2026**
+**Demo: December 2026**

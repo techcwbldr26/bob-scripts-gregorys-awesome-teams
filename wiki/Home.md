@@ -44,8 +44,9 @@ shows this in 24 seconds. Watch it once.
 - [Prompt Engineering](Prompt-Engineering)
 - [Context Engineering](Context-Engineering)
 - [Harness Engineering](Harness-Engineering)
+- [Enterprise Security Safeguards](Enterprise-Security-Safeguards) — what to settle before an agent can act
 - [Testing and Evals](Testing-and-Evals) — how you prove it works
-- [Demo Day](Demo-Day) — December 1st
+- [Demo Day](Demo-Day) — December 2026
 
 **Everything else**
 - [FAQ](FAQ)

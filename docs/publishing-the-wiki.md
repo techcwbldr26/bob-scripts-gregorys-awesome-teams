@@ -74,9 +74,10 @@ publish would overwrite them.
 | `Prompt-Engineering.md` | What you say |
 | `Context-Engineering.md` | What the model can see |
 | `Harness-Engineering.md` | The machinery around it |
+| `Enterprise-Security-Safeguards.md` | Safeguards before an agent can act |
 | `Firecrawl.md` | Real web access |
 | `Testing-and-Evals.md` | Proving it works |
-| `Demo-Day.md` | December 1st |
+| `Demo-Day.md` | December 2026 |
 | `Troubleshooting.md` | Symptom to fix |
 | `FAQ.md` | Common questions |
 
