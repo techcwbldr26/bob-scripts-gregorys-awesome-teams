@@ -87,9 +87,16 @@ the filename with hyphens turned into spaces.
 
 ## The images
 
-`The-Build-Flow.md` and `Skills-Reference.md` open with an animated SVG. Those
-images are **not** copied into the wiki repository: the pages link to them by
-absolute `raw.githubusercontent.com` URL on `main`, because a wiki page cannot
+Three pages carry animated SVGs, five in all:
+
+| Page | Images |
+| --- | --- |
+| `The-Build-Flow.md` | `build-flow.svg`, then `chain.svg` beneath it |
+| `Skills-Reference.md` | `skills.svg` |
+| `Enterprise-Security-Safeguards.md` | `security-safeguards.svg` at the top, `five-layers.svg` in the middle |
+
+Those images are **not** copied into the wiki repository: the pages link to them
+by absolute `raw.githubusercontent.com` URL on `main`, because a wiki page cannot
 reach a file in the code repository by relative path.
 
 Two consequences worth knowing:
