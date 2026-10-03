@@ -176,6 +176,16 @@ export async function buildPlan(root = payloadRoot()) {
     await fs.readFile(path.join(root, 'SKILLS.block.md'), 'utf8'),
   );
 
+  // Generated reference the kit owns outright. Overwriting it on reinstall is
+  // correct: it is derived from the payload, so a student edit would be lost
+  // the next time anyone regenerated it anyway.
+  add(
+    'owned',
+    'CHEATSHEET.md',
+    BOB_PATHS.cheatsheet,
+    await fs.readFile(path.join(root, 'CHEATSHEET.md'), 'utf8'),
+  );
+
   // Directories this kit owns.
   const dirs = [
     ['rules', BOB_PATHS.rules],

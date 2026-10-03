@@ -155,6 +155,7 @@ describe('install', () => {
     const root = await tempDir();
     await write(root, 'AGENTS.block.md', 'a');
     await write(root, 'SKILLS.block.md', 'b');
+    await write(root, 'CHEATSHEET.md', 'cheat sheet');
     await write(root, 'skills/BAD_NAME/SKILL.md', '---\nname: BAD_NAME\ndescription: d\n---\nx');
 
     const result = await install({ target, root });
@@ -168,6 +169,7 @@ describe('install', () => {
     const root = await tempDir();
     await write(root, 'AGENTS.block.md', 'cap is {{NOT_A_REAL_TOKEN}}');
     await write(root, 'SKILLS.block.md', 'b');
+    await write(root, 'CHEATSHEET.md', 'cheat sheet');
     await write(root, 'skills/good-skill/SKILL.md', '---\nname: good-skill\ndescription: d\n---\nx');
 
     const result = await install({ target, root });

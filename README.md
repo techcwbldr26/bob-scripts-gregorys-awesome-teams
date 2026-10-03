@@ -74,6 +74,7 @@ Full walkthrough: [docs/student-quickstart.md](docs/student-quickstart.md).
 your-project/
 ├── AGENTS.md                   Loaded by Bob every turn — short on purpose
 ├── SKILLS.md                   Index of the installed skills
+├── CHEATSHEET.md               One page: every command, skill, rule and number
 ├── .bob/
 │   ├── mcp.json                Firecrawl MCP server (merged, not overwritten)
 │   ├── commands/

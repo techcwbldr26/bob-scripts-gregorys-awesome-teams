@@ -37,6 +37,7 @@ export const BOB_PATHS = {
   dir: '.bob',
   agents: 'AGENTS.md',
   skillsIndex: 'SKILLS.md',
+  cheatsheet: 'CHEATSHEET.md',
   mcp: '.bob/mcp.json',
   commands: '.bob/commands',
   rules: '.bob/rules',

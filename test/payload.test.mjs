@@ -250,6 +250,7 @@ describe('buildPlan (the real payload)', () => {
     const dir = await tempDir();
     await write(dir, 'AGENTS.block.md', 'a');
     await write(dir, 'SKILLS.block.md', '{{SKILL_TABLE}}');
+    await write(dir, 'CHEATSHEET.md', 'cheat sheet');
     await write(dir, 'skills/Bad_Name/SKILL.md', '---\nname: Bad_Name\ndescription: d\n---\nb');
     const plan = await buildPlan(dir);
     assert.equal(plan.problems.length >= 1, true);
@@ -260,6 +261,7 @@ describe('buildPlan (the real payload)', () => {
     const dir = await tempDir();
     await write(dir, 'AGENTS.block.md', 'a');
     await write(dir, 'SKILLS.block.md', 'b');
+    await write(dir, 'CHEATSHEET.md', 'cheat sheet');
     await write(dir, 'skills/real-name/SKILL.md', '---\nname: other-name\ndescription: d\n---\nb');
     const plan = await buildPlan(dir);
     assert.match(plan.problems.join(' '), /does not match the folder|does not match/);

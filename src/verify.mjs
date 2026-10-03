@@ -40,6 +40,12 @@ export async function verify(target) {
     check('SKILLS.md', skillsIndex !== null, skillsIndex === null ? 'missing' : 'present'),
   );
 
+  // The one-page reference, dropped into the student's own folder.
+  const cheatsheet = await readIfExists(path.join(target, BOB_PATHS.cheatsheet));
+  checks.push(
+    check('CHEATSHEET.md', cheatsheet !== null, cheatsheet === null ? 'missing' : 'present'),
+  );
+
   // Slash commands. Driven by the COMMANDS list so a new command cannot ship
   // without a check.
   for (const name of COMMANDS) {
