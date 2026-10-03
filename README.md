@@ -18,12 +18,9 @@
 > demo day.
 
 
-Setup scripts that turn a plain project directory into one the **IBM Bob**
+Setup prompt and scripts that turn a plain project directory into one the **IBM Bob**
 harness already knows how to work in — so a university team can point Bob at
 their product idea and get useful work instead of confident guesses.
-
-This is a teaching kit for prompt, context and harness engineering. The thing it
-installs is the lesson.
 
 ## Quick start
 
