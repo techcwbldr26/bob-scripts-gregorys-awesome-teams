@@ -6,6 +6,24 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **"December 2026" was touching the right edge of its own chip** on the social
+  preview card — overrunning it by a pixel, in fact. The chip was sized from
+  `CHAR_RATIO.bold`, which is calibrated on the diagrams' body text and reads
+  display type about 9% narrow: it predicted 242px for a string Chromium sets
+  at 265px, which ate all 22px of the right padding and one more. The same
+  under-estimate had already been caught on the card's title; this was the
+  second place it bites.
+
+  Both lines of every chip are now centred, so a width error splits across two
+  margins instead of piling onto one, and the number is measured with the
+  display ratio. The rasteriser now checks each line against **its own chip**
+  rather than only against the outer frame — the frame check had passed while
+  the date sat 400px inside it and a pixel outside its box. Reproduced against
+  the shipped layout first: the new guard reports `"December 2026" has 22px
+  left, -1px right`, and finds a second chip at 3px that nobody had noticed.
+
 ### Added
 
 - **A social preview card**, `assets/social-card.png`, generated from

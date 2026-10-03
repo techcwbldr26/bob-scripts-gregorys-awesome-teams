@@ -66,6 +66,27 @@ describe('assets/social-card.svg', () => {
     assert.ok(source.includes(DEMO_DATE), `the card should show demo day ${DEMO_DATE}`);
   });
 
+  it('centres both lines of every stat chip', async () => {
+    // Left-aligned, the chip's whole width error landed on the right margin and
+    // "December 2026" shipped overrunning its own corner by a pixel. Centred,
+    // the error splits across two margins. The rasteriser measures the real
+    // padding; this is the cheap check that survives without Playwright.
+    const source = await svg();
+    const chips = [...source.matchAll(/<g data-chip="\d+">(.*?)<\/g>/g)].map((m) => m[1]);
+    assert.equal(chips.length, 4, 'expected four stat chips');
+    for (const chip of chips) {
+      const texts = [...chip.matchAll(/<text[^>]*>/g)].map((m) => m[0]);
+      assert.equal(texts.length, 2, 'each chip has a number and a label');
+      for (const el of texts) {
+        assert.match(el, /text-anchor="middle"/, `not centred: ${el}`);
+      }
+      // Both lines must be centred on the same x, or they are not centred on
+      // the chip — they are merely centred on two different points.
+      const xs = new Set(texts.map((el) => /x="([^"]+)"/.exec(el)[1]));
+      assert.equal(xs.size, 1, `the two lines sit on different centres: ${[...xs].join(', ')}`);
+    }
+  });
+
   it('credits Gregory, since that is what the card is for', async () => {
     assert.match(
       await svg(),

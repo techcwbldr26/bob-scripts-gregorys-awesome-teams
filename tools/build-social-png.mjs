@@ -93,6 +93,55 @@ try {
     );
   }
 
+  // Fitting inside the frame is not the same as fitting inside your own box.
+  // "December 2026" cleared the frame by 400px while overrunning its chip by
+  // one, because the chip was sized from the same under-estimate that set the
+  // text. Measure each chip's lines against the chip.
+  const MIN_PAD = 8;
+  const chips = await page.evaluate((minPad) => {
+    return [...document.querySelectorAll('g[data-chip]')].map((g) => {
+      const r = g.querySelector('rect');
+      const left = parseFloat(r.getAttribute('x'));
+      const right = left + parseFloat(r.getAttribute('width'));
+      const lines = [...g.querySelectorAll('text')].map((el) => {
+        const box = el.getBBox();
+        return {
+          text: el.textContent,
+          pad: { left: Math.round(box.x - left), right: Math.round(right - (box.x + box.width)) },
+        };
+      });
+      return {
+        index: g.getAttribute('data-chip'),
+        width: Math.round(right - left),
+        lines,
+        tight: lines.filter((l) => l.pad.left < minPad || l.pad.right < minPad),
+      };
+    });
+  }, MIN_PAD);
+
+  console.log('');
+  for (const c of chips) {
+    for (const l of c.lines) {
+      console.log(
+        `  chip ${c.index} (${String(c.width).padStart(3)}px)  pad L${String(l.pad.left).padStart(3)} R${String(l.pad.right).padStart(3)}  ${l.text}`,
+      );
+    }
+  }
+
+  const tight = chips.filter((c) => c.tight.length);
+  if (tight.length) {
+    throw new Error(
+      `social-card: text is touching the edge of its chip (needs ${MIN_PAD}px):\n` +
+        tight
+          .flatMap((c) =>
+            c.tight.map(
+              (l) => `  chip ${c.index}: "${l.text}" has ${l.pad.left}px left, ${l.pad.right}px right`,
+            ),
+          )
+          .join('\n'),
+    );
+  }
+
   await page.screenshot({ path: PNG, clip: { x: 0, y: 0, width: WIDTH, height: HEIGHT } });
 } finally {
   await browser.close();

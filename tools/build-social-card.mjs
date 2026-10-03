@@ -122,25 +122,50 @@ const DISPLAY_RATIO = 0.68;
  * ------------------------------------------------------------------ */
 // Laid out left to right from measured widths rather than a fixed pitch, so a
 // long value (the demo date is the long one) cannot sit on its neighbour.
+//
+// Both lines are centred in their chip. Left-aligning them put all the slack on
+// one side, so an under-estimated width showed up as text running into the
+// right edge rather than as a chip that was merely a little tight — which is
+// exactly how "December 2026" shipped touching its own corner. Centred, a
+// width error is split between two margins and stays legible while the guards
+// below catch it.
 const CHIP_Y = 420;
 const CHIP_H = 74;
-const CHIP_PAD = 22;
+const CHIP_PAD = 24;
 const CHIP_GAP = 16;
+const CHIP_NUMBER_SIZE = 30;
+const CHIP_LABEL_SIZE = 17;
 
 {
   let x = MARGIN;
-  for (const chip of CHIPS) {
-    const numberSize = 30;
-    const labelSize = 17;
-    const numberW = chip.n.length * numberSize * CHAR_RATIO.bold;
-    const labelW = chip.label.length * labelSize * CHAR_RATIO.regular;
+  for (const [i, chip] of CHIPS.entries()) {
+    // The number is display type, so it takes DISPLAY_RATIO for the same reason
+    // the title does: CHAR_RATIO.bold is calibrated on body text and reads
+    // "December 2026" 23px narrower than Chromium actually sets it.
+    const numberW = chip.n.length * CHIP_NUMBER_SIZE * DISPLAY_RATIO;
+    const labelW = chip.label.length * CHIP_LABEL_SIZE * CHAR_RATIO.regular;
     const w = Math.max(numberW, labelW) + CHIP_PAD * 2;
+    const mid = x + w / 2;
 
+    // Grouped and tagged so the rasteriser can check each line against its own
+    // chip rather than only against the outer frame. The frame check passed
+    // while the date was overrunning its box by a pixel.
     body.push(
-      `<rect x="${x}" y="${CHIP_Y}" width="${w.toFixed(1)}" height="${CHIP_H}" rx="12"` +
-        ` fill="url(#hatch-${chip.kind})" stroke="${STROKE[chip.kind]}" stroke-width="1.8"/>`,
-      t(x + CHIP_PAD, CHIP_Y + 34, chip.n, { size: numberSize, weight: 700, fill: C.white }),
-      t(x + CHIP_PAD, CHIP_Y + 57, chip.label, { size: labelSize, fill: C.muted }),
+      `<g data-chip="${i}">` +
+        `<rect x="${x.toFixed(1)}" y="${CHIP_Y}" width="${w.toFixed(1)}" height="${CHIP_H}" rx="12"` +
+        ` fill="url(#hatch-${chip.kind})" stroke="${STROKE[chip.kind]}" stroke-width="1.8"/>` +
+        t(mid, CHIP_Y + 34, chip.n, {
+          size: CHIP_NUMBER_SIZE,
+          weight: 700,
+          fill: C.white,
+          anchor: 'middle',
+        }) +
+        t(mid, CHIP_Y + 57, chip.label, {
+          size: CHIP_LABEL_SIZE,
+          fill: C.muted,
+          anchor: 'middle',
+        }) +
+        `</g>`,
     );
     x += w + CHIP_GAP;
   }
