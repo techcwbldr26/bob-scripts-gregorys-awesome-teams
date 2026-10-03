@@ -119,4 +119,4 @@ export const FIRECRAWL_GATED_TOOLS = [
 ];
 
 /** The deadline the whole kit is pointed at. */
-export const DEMO_DATE = 'December 1st, 2026';
+export const DEMO_DATE = 'December 2026';

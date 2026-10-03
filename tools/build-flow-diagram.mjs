@@ -6,7 +6,7 @@
  * rehearsal — and for each one states the failure it prevents, the artefact it
  * leaves behind on disk, and the signal that it actually worked. The artefacts
  * accumulate along the bottom, so the last frame answers the only question that
- * matters on December 1st: what have you actually got?
+ * matters on demo day: what have you actually got?
  *
  * Generated rather than hand-written for the same reason as the banner: it is
  * one looping CSS timeline, and hand-computed keyframe percentages rot the
@@ -17,6 +17,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { DEMO_DATE } from '../src/constants.mjs';
 import { COVERAGE_GATE } from '../src/payload.mjs';
 import {
   C,
@@ -209,7 +210,7 @@ body.push(
     { size: 12.5, fill: C.muted },
   ),
   t(964, 46, `${STAGES.length} stages`, { size: 12, fill: C.muted, anchor: 'end', ls: 0.6 }),
-  t(964, 70, 'demo day: December 1st, 2026', { size: 12, fill: C.muted, anchor: 'end' }),
+  t(964, 70, `demo day: ${DEMO_DATE}`, { size: 12, fill: C.muted, anchor: 'end' }),
 );
 
 /* ------------------------------------------------------------------ *
@@ -350,7 +351,7 @@ STAGES.forEach((s, i) => {
 body.push(
   `<g class="${fade(at(0) + 2.2, ENDS)}">` +
     `<line x1="310" y1="434" x2="970" y2="434" stroke="${C.track}" stroke-width="1.2"/>` +
-    t(30, 438, 'WHAT YOU HAVE ON DECEMBER 1ST', { size: 10.5, fill: C.muted, ls: 1.1 }) +
+    t(30, 438, 'WHAT YOU HAVE ON DEMO DAY', { size: 10.5, fill: C.muted, ls: 1.1 }) +
     `</g>`,
 );
 

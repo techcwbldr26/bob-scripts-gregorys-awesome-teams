@@ -205,7 +205,7 @@ Once it finishes, see [the README](README.md) for what each piece does, and
 
 The short version: Bob now loads your project's rules on every turn, has ten
 skills it can reach for, can search the real web through Firecrawl instead of
-guessing from memory, and knows that your demo is on December 1st, 2026.
+guessing from memory, and knows that your demo is in December 2026.
 
 `CHEATSHEET.md` is now in your project folder: one page, every command and
 skill. Keep it open while you work. It is also on the

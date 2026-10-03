@@ -87,7 +87,7 @@ See [Testing and Evals](Testing-and-Evals).
 > Harden a project for a live demo in front of an audience and rehearse the
 > failure modes.
 
-**Reach for it:** in the weeks before December 1st. Read it in week one anyway.
+**Reach for it:** in the weeks before the demo. Read it in week one anyway.
 
 **It produces:** `docs/demo-script.md` and `docs/demo-qa.md`.
 

@@ -8,6 +8,32 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **An Enterprise Security Safeguards page** in the wiki's Craft section,
+  adapted from an article Gregory supplied. Six safeguards to settle before an
+  agent is allowed to act, the five layers between a proof of concept and
+  production, who owns what, and the question worth asking before any
+  deployment. Each safeguard carries a note on what it means in a student's own
+  project — the one most likely to bite them is that everything Firecrawl
+  returns is untrusted content, and a scraped page can contain instructions.
+- **Two animated diagrams for it.** `assets/security-safeguards.svg` walks the
+  six safeguards while, underneath, the article's own worked example runs: an
+  agent that only needs to summarise email is granted six permissions and the
+  five it never needed are struck off until one is left.
+  `assets/five-layers.svg` builds the five layers bottom-up and then draws
+  governance and security as a band through all of them, because the point of
+  the framework is that security is not the fourth step.
+
+### Changed
+
+- **Demo day is now "December 2026"**, not December 1st — the date is not set
+  yet. `DEMO_DATE` is the single source, and the build-flow diagram now reads
+  from it rather than carrying the date twice as a literal.
+- **The Demo Day page opens with Gregory's wording**: teams demo their
+  projects, read it as soon as possible, and the goal is enterprise-class,
+  production-ready work.
+
+### Added
+
 - **`CHEATSHEET.md` is now installed into the student's own project folder**, not
   only published to the wiki and the repo root. A page a student has to go and
   find is a page they do not read; this one is in the folder they are already
