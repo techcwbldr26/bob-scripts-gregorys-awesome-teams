@@ -8,6 +8,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **`CHEATSHEET.md` is now installed into the student's own project folder**, not
+  only published to the wiki and the repo root. A page a student has to go and
+  find is a page they do not read; this one is in the folder they are already
+  working in. The installer owns it outright — it is generated from the payload,
+  so overwriting it on reinstall is correct — and `verify` reports it like
+  everything else the kit installs.
+
+### Added
+
 - **`improve-prompt-kit/` — `improve-prompt` as a complete, portable skill.**
   Students asked whether it was a whole skills kit with its own `AGENTS.md`,
   `SKILL.md`, examples and references, so that it works in any harness or IDE.

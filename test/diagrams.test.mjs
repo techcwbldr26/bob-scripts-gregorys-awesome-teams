@@ -18,7 +18,7 @@ import { after, describe, it } from 'node:test';
 const runNode = (args) => promisify(execFile)(process.execPath, args, { cwd: repoRoot });
 
 import { COMMANDS } from '../src/constants.mjs';
-import { COVERAGE_GATE, payloadRoot, readSkills } from '../src/payload.mjs';
+import { COVERAGE_GATE, buildPlan, payloadRoot, readSkills } from '../src/payload.mjs';
 import { cleanup } from './helpers.mjs';
 import { describeGeneratedSvg, repoRoot } from './helpers/svg-asset.mjs';
 
@@ -220,8 +220,21 @@ describe('the cheat sheet is generated and current', () => {
     assert.equal(await sheet(), before, 'run `npm run build:cheatsheet` and commit the result');
   });
 
-  it('is the same page in the repo and in the wiki', async () => {
-    assert.equal(await fs.readFile(path.join(repoRoot, 'wiki', 'Cheat-Sheet.md'), 'utf8'), await sheet());
+  it('is the same page in all three homes', async () => {
+    const expected = await sheet();
+    for (const rel of [['wiki', 'Cheat-Sheet.md'], ['payload', 'CHEATSHEET.md']]) {
+      assert.equal(await fs.readFile(path.join(repoRoot, ...rel), 'utf8'), expected, rel.join('/'));
+    }
+  });
+
+  it('is installed into the student\u2019s own project folder', async () => {
+    // A page on the wiki is a page a student has to go and find. The point of
+    // this one is that it is already in the folder they are working in.
+    const plan = await buildPlan();
+    const entry = plan.entries.find((e) => e.to === 'CHEATSHEET.md');
+    assert.ok(entry, 'the installer should write CHEATSHEET.md into the project');
+    assert.equal(entry.kind, 'owned', 'it is generated, so the kit owns it outright');
+    assert.equal(entry.contents, await sheet());
   });
 
   it('lists every command and every skill the kit installs', async () => {

@@ -24,9 +24,14 @@ import {
 import { COVERAGE_GATE, payloadRoot, readSkills } from '../src/payload.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-// Two homes, one source: the repo root for anyone reading the code, and the
-// wiki for the students who never leave it.
-const OUT = [path.join(root, 'CHEATSHEET.md'), path.join(root, 'wiki', 'Cheat-Sheet.md')];
+// Three homes, one source: the repo root for anyone reading the code, the wiki
+// for students who never leave it, and the payload so the installer drops a
+// copy into the student's own project folder.
+const OUT = [
+  path.join(root, 'CHEATSHEET.md'),
+  path.join(root, 'wiki', 'Cheat-Sheet.md'),
+  path.join(root, 'payload', 'CHEATSHEET.md'),
+];
 
 const num = (n) => n.toLocaleString('en-US');
 

@@ -51,8 +51,8 @@ HOW TO WORK WITH ME
 
 WHAT "DONE" MEANS
 1. Node.js 24 or later is installed, and you have shown me the version number.
-2. This folder contains AGENTS.md, SKILLS.md, a .bob folder holding 10 skills and
-   4 rules, and examples/ and references/ folders.
+2. This folder contains AGENTS.md, SKILLS.md, CHEATSHEET.md, a .bob folder
+   holding 10 skills and 4 rules, and examples/ and references/ folders.
 3. This folder has a .gitignore containing .env, so my key can never be committed.
 4. This folder has a .env file containing my real Firecrawl key.
 5. The kit's verify command reports every single line as "ok".
@@ -163,9 +163,8 @@ In plain language, tell me:
 - that if I am ever unsure how to word a request, I can type /improve-prompt
   followed by my rough wording, and it will rewrite the prompt and show me what
   it changed, without doing the task
-- that there is a one-page cheat sheet listing every command and skill at
-  https://github.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/wiki/Cheat-Sheet
-  and it is worth keeping open in a browser tab
+- that CHEATSHEET.md is now in this folder: one page with every command and
+  skill on it, worth keeping open while I work
 Then stop. Do not start building my project yet.
 
 RULES THROUGHOUT
@@ -208,5 +207,7 @@ The short version: Bob now loads your project's rules on every turn, has ten
 skills it can reach for, can search the real web through Firecrawl instead of
 guessing from memory, and knows that your demo is on December 1st, 2026.
 
-Keep the [cheat sheet](https://github.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/wiki/Cheat-Sheet)
-open in a tab while you work — one page, every command and skill.
+`CHEATSHEET.md` is now in your project folder: one page, every command and
+skill. Keep it open while you work. It is also on the
+[wiki](https://github.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/wiki/Cheat-Sheet)
+if you would rather have it in a browser tab.

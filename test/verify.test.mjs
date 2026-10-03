@@ -135,6 +135,16 @@ describe('verify', () => {
     assert.equal(check.ok, false);
   });
 
+  it('notices a missing cheat sheet', async () => {
+    const target = await tempDir();
+    await install({ target });
+    await fs.rm(path.join(target, BOB_PATHS.cheatsheet));
+
+    const check = find(await verify(target), 'CHEATSHEET.md');
+    assert.equal(check.ok, false);
+    assert.match(check.detail, /missing/);
+  });
+
   it('notices missing rules and docs folders', async () => {
     const target = await tempDir();
     await install({ target });
