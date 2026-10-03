@@ -6,6 +6,32 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Three wiki pages renamed** to the titles Gregory gave them on GitHub:
+  `Glossary` → `Every term you need to know in plain English`,
+  `Getting-Started` → `One Prompt to Get Started`, and `Cheat-Sheet` →
+  `One Page Commands Reference`. The repository now carries those names, so
+  publishing updates the live pages instead of creating a second copy of each.
+  Every link to them across the wiki, the README, `START-HERE.md` and `docs/`
+  was repointed, and `tools/build-cheatsheet.mjs` writes to the new filename.
+
+### Fixed
+
+- **The four setup scripts described a kit that no longer existed.** Their
+  headers still said "nine skills", "four rule files" and "the
+  /gregorys-awesome-teams slash command" — written before the tenth skill, the
+  `/improve-prompt` command and the installed `CHEATSHEET.md`. They now name
+  both commands and the cheat sheet, and state no counts at all: these headers
+  cannot be generated, so a number in one is only ever waiting to go stale.
+  A test asserts each script names every command in `COMMANDS` and refuses any
+  line that counts skills, rules or commands.
+
+  The scripts' *behaviour* was already current. All four pass the same options
+  through to one Node installer, the Node thresholds match (20 to install, 24
+  for Bob Shell), and a real run installs ten skills, both commands and the
+  cheat sheet, verifies clean, and is a no-op the second time.
+
 ### Added
 
 - **An Enterprise Security Safeguards page** in the wiki's Craft section,

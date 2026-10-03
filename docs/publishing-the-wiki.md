@@ -66,9 +66,9 @@ publish would overwrite them.
 | `Home.md` | Landing page |
 | `_Sidebar.md` | Navigation shown on every page |
 | `_Footer.md` | Footer shown on every page |
-| `Getting-Started.md` | Ten-minute setup |
-| `Cheat-Sheet.md` | Everything on one page (generated) |
-| `Glossary.md` | Every term in plain English |
+| `One-Prompt-to-Get-Started.md` | Ten-minute setup |
+| `One-Page-Commands-Reference.md` | Everything on one page (generated) |
+| `Every-term-you-need-to-know-in-plain-English.md` | Every term in plain English |
 | `The-Build-Flow.md` | The six stages |
 | `Skills-Reference.md` | All ten skills |
 | `Prompt-Engineering.md` | What you say |
@@ -87,9 +87,16 @@ the filename with hyphens turned into spaces.
 
 ## The images
 
-`The-Build-Flow.md` and `Skills-Reference.md` open with an animated SVG. Those
-images are **not** copied into the wiki repository: the pages link to them by
-absolute `raw.githubusercontent.com` URL on `main`, because a wiki page cannot
+Three pages carry animated SVGs, five in all:
+
+| Page | Images |
+| --- | --- |
+| `The-Build-Flow.md` | `build-flow.svg`, then `chain.svg` beneath it |
+| `Skills-Reference.md` | `skills.svg` |
+| `Enterprise-Security-Safeguards.md` | `security-safeguards.svg` at the top, `five-layers.svg` in the middle |
+
+Those images are **not** copied into the wiki repository: the pages link to them
+by absolute `raw.githubusercontent.com` URL on `main`, because a wiki page cannot
 reach a file in the code repository by relative path.
 
 Two consequences worth knowing:

@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { after, describe, it } from 'node:test';
 
-import { BOB_PATHS } from '../src/constants.mjs';
+import { BOB_PATHS, COMMANDS } from '../src/constants.mjs';
 import { cleanup, exists, tempDir } from './helpers.mjs';
 
 const run = promisify(execFile);
@@ -415,4 +415,45 @@ describe('no shell script carries CRLF line endings', () => {
       assert.ok(!source.includes('\r'), `${rel} contains a carriage return`);
     }
   });
+});
+
+describe('what each script says it installs', () => {
+  // These headers are the only description of the kit a student reads before
+  // running anything, and they are the one part of the repository that cannot
+  // be generated. They had drifted twice over: "nine skills" after a tenth was
+  // added, and a single slash command after a second one shipped. So assert the
+  // claims instead of the prose, and forbid the counts that go stale.
+  const ALL = [
+    'install-macos-intel.sh',
+    'install-macos-apple-silicon.sh',
+    'install-linux.sh',
+    'install-windows.ps1',
+  ];
+
+  for (const file of ALL) {
+    describe(file, () => {
+      it('names every slash command the installer writes', async () => {
+        const source = await read(file);
+        for (const command of COMMANDS) {
+          assert.ok(source.includes(`/${command}`), `does not mention /${command}`);
+        }
+      });
+
+      it('names the files the student will actually find', async () => {
+        const source = await read(file);
+        for (const name of ['AGENTS.md', 'SKILLS.md', BOB_PATHS.cheatsheet]) {
+          assert.ok(source.includes(name), `does not mention ${name}`);
+        }
+      });
+
+      it('never states a count of skills, rules or commands', async () => {
+        // A number here can only be wrong later; --verify reports the real set.
+        const source = await read(file);
+        const counted =
+          /\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+(skills?|rules?|rule files?|commands?)\b/i;
+        const offenders = source.split('\n').filter((line) => counted.test(line));
+        assert.deepEqual(offenders, [], 'these lines hardcode a count that will go stale');
+      });
+    });
+  }
 });

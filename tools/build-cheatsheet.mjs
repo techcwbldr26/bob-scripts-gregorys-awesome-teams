@@ -29,7 +29,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 // copy into the student's own project folder.
 const OUT = [
   path.join(root, 'CHEATSHEET.md'),
-  path.join(root, 'wiki', 'Cheat-Sheet.md'),
+  path.join(root, 'wiki', 'One-Page-Commands-Reference.md'),
   path.join(root, 'payload', 'CHEATSHEET.md'),
 ];
 

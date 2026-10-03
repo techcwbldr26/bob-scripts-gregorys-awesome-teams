@@ -134,5 +134,5 @@ explains it, and it is the most useful page here once you are up and running.
 ## Next
 
 - [The Build Flow](The-Build-Flow) — what the six stages are and why that order
-- [Glossary](Glossary) — any word that stopped you
+- [Glossary](Every-term-you-need-to-know-in-plain-English) — any word that stopped you
 - [Prompt Engineering](Prompt-Engineering) — getting better answers immediately
