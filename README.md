@@ -19,8 +19,8 @@
 
 
 Setup prompt and scripts that turn a plain project directory into one the **IBM Bob**
-harness already knows how to work in — so a university team can point Bob at
-their product idea and get useful work instead of confident guesses.
+harness already knows how to work with, so a university team can point Bob at
+their product idea and get Enterprise class results instead of confident guesses.
 
 ## Quick start
 
