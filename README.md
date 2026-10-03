@@ -6,7 +6,7 @@
 
 # Gregory's Awesome Teams
 
-> ### Never used an AI assistant before?
+> ### Copy the prompt in [Start here](START-HERE.md) and you are ready to Go! 
 >
 > **[Start here](START-HERE.md).** Copy one block of text, paste it into Bob, and
 > it will set your project up for you — checking Node, installing the kit and
