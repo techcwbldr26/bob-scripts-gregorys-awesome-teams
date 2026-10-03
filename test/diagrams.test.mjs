@@ -319,7 +319,10 @@ describe('the cheat sheet is generated and current', () => {
 
   it('is the same page in all three homes', async () => {
     const expected = await sheet();
-    for (const rel of [['wiki', 'Cheat-Sheet.md'], ['payload', 'CHEATSHEET.md']]) {
+    for (const rel of [
+      ['wiki', 'One-Page-Commands-Reference.md'],
+      ['payload', 'CHEATSHEET.md'],
+    ]) {
       assert.equal(await fs.readFile(path.join(repoRoot, ...rel), 'utf8'), expected, rel.join('/'));
     }
   });

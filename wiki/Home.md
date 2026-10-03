@@ -2,7 +2,7 @@
 
 This is the handbook for your project. You are building a product or service using the IBM Bob harness.
 
-**New here? Go straight to [Getting Started](Getting-Started).** It takes about
+**New here? Go straight to [Getting Started](One-Prompt-to-Get-Started).** It takes about
 ten minutes and you do not need to understand anything first.
 
 ---
@@ -30,13 +30,13 @@ shows this in 24 seconds. Watch it once.
 ## Where to go
 
 **Setting up**
-- [Getting Started](Getting-Started) — paste one prompt, be ready in ten minutes
+- [Getting Started](One-Prompt-to-Get-Started) — paste one prompt, be ready in ten minutes
 - [Troubleshooting](Troubleshooting) — when something goes wrong
-- [Glossary](Glossary) — every term, in plain English
+- [Glossary](Every-term-you-need-to-know-in-plain-English) — every term, in plain English
 
 **Doing the work**
 - [The Build Flow](The-Build-Flow) — the six stages, and why that order
-- [Cheat Sheet](Cheat-Sheet) — commands, skills, rules and numbers on one page
+- [Cheat Sheet](One-Page-Commands-Reference) — commands, skills, rules and numbers on one page
 - [Skills Reference](Skills-Reference) — the ten skills and when to reach for each
 - [Firecrawl](Firecrawl) — how your agent sees the real world
 

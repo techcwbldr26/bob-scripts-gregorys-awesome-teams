@@ -117,6 +117,6 @@ describe('the wiki agrees with the kit', () => {
   });
 
   it('points students at the setup prompt that exists', async () => {
-    assert.match(await read('Getting-Started.md'), /START-HERE\.md/);
+    assert.match(await read('One-Prompt-to-Get-Started.md'), /START-HERE\.md/);
   });
 });

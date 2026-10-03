@@ -209,5 +209,5 @@ guessing from memory, and knows that your demo is in December 2026.
 
 `CHEATSHEET.md` is now in your project folder: one page, every command and
 skill. Keep it open while you work. It is also on the
-[wiki](https://github.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/wiki/Cheat-Sheet)
+[wiki](https://github.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/wiki/One-Page-Commands-Reference)
 if you would rather have it in a browser tab.

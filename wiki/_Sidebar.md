@@ -1,9 +1,9 @@
 ### [Home](Home)
 
 **Start**
-- [Getting Started](Getting-Started)
-- [Cheat Sheet](Cheat-Sheet)
-- [Glossary](Glossary)
+- [Getting Started](One-Prompt-to-Get-Started)
+- [Cheat Sheet](One-Page-Commands-Reference)
+- [Glossary](Every-term-you-need-to-know-in-plain-English)
 - [Troubleshooting](Troubleshooting)
 
 **Build**

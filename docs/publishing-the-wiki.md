@@ -66,9 +66,9 @@ publish would overwrite them.
 | `Home.md` | Landing page |
 | `_Sidebar.md` | Navigation shown on every page |
 | `_Footer.md` | Footer shown on every page |
-| `Getting-Started.md` | Ten-minute setup |
-| `Cheat-Sheet.md` | Everything on one page (generated) |
-| `Glossary.md` | Every term in plain English |
+| `One-Prompt-to-Get-Started.md` | Ten-minute setup |
+| `One-Page-Commands-Reference.md` | Everything on one page (generated) |
+| `Every-term-you-need-to-know-in-plain-English.md` | Every term in plain English |
 | `The-Build-Flow.md` | The six stages |
 | `Skills-Reference.md` | All ten skills |
 | `Prompt-Engineering.md` | What you say |
