@@ -2,6 +2,7 @@
 
 **Start**
 - [Getting Started](Getting-Started)
+- [Cheat Sheet](Cheat-Sheet)
 - [Glossary](Glossary)
 - [Troubleshooting](Troubleshooting)
 

@@ -2,9 +2,7 @@
 
 ![An animated diagram of the six build stages. Each stage lights up in turn and shows the skill that runs it, the failure it prevents, the file it leaves behind and the signal that it worked. An arc from implement back to spec shows that going backwards is the process working, and the artefacts accumulate along the bottom as an inventory for demo day.](https://raw.githubusercontent.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/main/assets/build-flow.svg)
 
-```
-discover → grill → spec → implement → evals → demo rehearsal
-```
+![An animated strip of the six build stages in order: discover, grill, spec, implement, evals and demo rehearsal. The whole chain stays visible while a highlight walks along it, and one line underneath says what each stage is for and which skill runs it.](https://raw.githubusercontent.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/main/assets/chain.svg)
 
 Six stages. Each one exists to prevent a specific, expensive failure, and each
 makes the next one cheaper. Type `/gregorys-awesome-teams` at any point and it

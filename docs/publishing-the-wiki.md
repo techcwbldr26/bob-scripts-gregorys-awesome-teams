@@ -67,9 +67,10 @@ publish would overwrite them.
 | `_Sidebar.md` | Navigation shown on every page |
 | `_Footer.md` | Footer shown on every page |
 | `Getting-Started.md` | Ten-minute setup |
+| `Cheat-Sheet.md` | Everything on one page (generated) |
 | `Glossary.md` | Every term in plain English |
 | `The-Build-Flow.md` | The six stages |
-| `Skills-Reference.md` | All nine skills |
+| `Skills-Reference.md` | All ten skills |
 | `Prompt-Engineering.md` | What you say |
 | `Context-Engineering.md` | What the model can see |
 | `Harness-Engineering.md` | The machinery around it |

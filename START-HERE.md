@@ -51,7 +51,7 @@ HOW TO WORK WITH ME
 
 WHAT "DONE" MEANS
 1. Node.js 24 or later is installed, and you have shown me the version number.
-2. This folder contains AGENTS.md, SKILLS.md, a .bob folder holding 9 skills and
+2. This folder contains AGENTS.md, SKILLS.md, a .bob folder holding 10 skills and
    4 rules, and examples/ and references/ folders.
 3. This folder has a .gitignore containing .env, so my key can never be committed.
 4. This folder has a .env file containing my real Firecrawl key.
@@ -103,7 +103,7 @@ Call the folder from step 4 <kit>:
   Mac, Intel:          <kit>/scripts/install-macos-intel.sh --target "<this folder>"
   Linux:               <kit>/scripts/install-linux.sh --target "<this folder>"
   Windows PowerShell:  <kit>\scripts\install-windows.ps1 -Target "<this folder>"
-Show me the output. It should finish by listing 9 skills. If I picked the wrong
+Show me the output. It should finish by listing 10 skills. If I picked the wrong
 Mac script, it will refuse and name the right one, so just run that instead.
 Running it twice is safe: the second run says "already current".
 

@@ -2,11 +2,11 @@
 /**
  * Generates `assets/skills.svg`, the banner for the wiki's Skills Reference.
  *
- * The page's claim is that having nine skills "costs almost nothing", and this
+ * The page's claim is that having this many skills "costs almost nothing", and
  * is the arithmetic behind it: only each skill's one-line description sits in
  * context, and the body loads when the skill actually runs. The diagram shows
  * the nine descriptions as a sliver, one loaded body beside it, and what the
- * same nine skills would cost if every body were always resident.
+ * the same skills would cost if every body were always resident.
  *
  * Every number is measured from `payload/skills/` at build time, so the
  * diagram cannot drift from the skills it describes. Tokens are estimated as
@@ -22,9 +22,12 @@ import { fileURLToPath } from 'node:url';
 import { payloadRoot, readSkills } from '../src/payload.mjs';
 import {
   C,
+  CHAR_RATIO,
   CYCLE,
   STROKE,
   assemble,
+  charBudget,
+  fitSize,
   hatchPatterns,
   text as t,
   timeline,
@@ -54,7 +57,7 @@ const CHAIN = [
   ['build-evals', 'orange'],
   ['demo-rehearsal', 'orange'],
 ];
-const SITUATIONAL = ['wizard', 'rag-architecture', 'harness-tuning'];
+const SITUATIONAL = ['improve-prompt', 'wizard', 'rag-architecture', 'harness-tuning'];
 
 /**
  * The chain warms from blue to orange across the six stages, matching the build
@@ -137,14 +140,92 @@ const body = [];
  * Geometry
  * ------------------------------------------------------------------ */
 const W = 1000;
-const H = 856;
 
-const CARD = { w: 300, h: 104, stepX: 320, x0: 32 };
-const ROW_Y = [116, 230, 370];
-const cardX = (i) => CARD.x0 + (i % 3) * CARD.stepX;
-const cardY = (i) => (i < 3 ? ROW_Y[0] : i < 6 ? ROW_Y[1] : ROW_Y[2]);
+/**
+ * Two grids, not one.
+ *
+ * The chain keeps three wide columns over two rows, because its six skills are
+ * an ordered path and the rows read as halves of it. The situational skills get
+ * a row of their own, as many columns as there are of them, so adding one does
+ * not leave a ragged hole in a 3-wide grid. Card height is derived from the
+ * longest card's text and the generator refuses to emit a card that overflows.
+ */
+const GRID = { x0: 32, right: 968, gap: 20 };
+const CHAIN_COLS = 3;
+const SITU_COLS = SITUATIONAL.length;
+const span = GRID.right - GRID.x0;
+const colW = (cols) => (span - (cols - 1) * GRID.gap) / cols;
 
-const BAR = { x: 32, w: 940, h: 52, aY: 590, bY: 714 };
+const NAME_SIZE = 12.5;
+const DESC_SIZE = 10;
+const DESC_STEP = 12.5;
+const PAD = { left: 14, right: 12 };
+
+const layout = (i) => {
+  const chain = i < CHAIN.length;
+  const cols = chain ? CHAIN_COLS : SITU_COLS;
+  const n = chain ? i : i - CHAIN.length;
+  const w = colW(cols);
+  return { chain, w, x: GRID.x0 + (n % cols) * (w + GRID.gap), row: chain ? Math.floor(n / cols) : 2 };
+};
+
+/** Wrap each card's summary to its own column width, then size to fit. */
+const CARD_TEXT = CARDS.map((c, i) => {
+  const { w } = layout(i);
+  const inner = w - PAD.left - PAD.right;
+  const lines = wrap(c.summary, charBudget(inner, DESC_SIZE, CHAR_RATIO.regular));
+  return {
+    inner,
+    lines,
+    size: Number(fitSize(lines, inner, DESC_SIZE, { ratio: CHAR_RATIO.regular }).toFixed(2)),
+  };
+});
+
+// Each group gets its own height. A shared one would size every card to the
+// tallest, which leaves the wide chain cards mostly empty.
+const groupHeight = (from, to) =>
+  Math.ceil(44 + Math.max(...CARD_TEXT.slice(from, to).map((c) => c.lines.length)) * DESC_STEP + 18);
+
+const CARD = {
+  chain: groupHeight(0, CHAIN.length),
+  situational: groupHeight(CHAIN.length, CARDS.length),
+};
+
+const ROW_Y = [116, 116 + CARD.chain + 10, 0];
+ROW_Y[2] = ROW_Y[1] + CARD.chain + 44;
+const CARDS_BOTTOM = ROW_Y[2] + CARD.situational;
+
+const cardX = (i) => layout(i).x;
+const cardY = (i) => ROW_Y[layout(i).row];
+const cardW = (i) => layout(i).w;
+const cardH = (i) => (layout(i).chain ? CARD.chain : CARD.situational);
+
+for (const [i, c] of CARD_TEXT.entries()) {
+  for (const line of c.lines) {
+    const width = line.length * c.size * CHAR_RATIO.regular;
+    if (width > c.inner + 0.5) {
+      throw new Error(
+        `skills: "${line}" is ~${width.toFixed(0)}px wide in a ${c.inner.toFixed(0)}px card ` +
+          `(${CARDS[i].name})`,
+      );
+    }
+  }
+}
+
+// The lower half hangs off the bottom of the card grid, so adding a skill
+// moves the bars rather than being drawn underneath them.
+const DIVIDER_Y = CARDS_BOTTOM + 28;
+const BAR = {
+  x: 32,
+  w: 940,
+  h: 52,
+  aY: DIVIDER_Y + 88,
+  bY: DIVIDER_Y + 212,
+};
+const CAPTION_A = BAR.aY - 8;
+const CAPTION_B = BAR.bY - 8;
+const CLOSING_Y = BAR.bY + BAR.h + 48;
+const H = Math.ceil(CLOSING_Y + 44);
 const SCALE = BAR.w / EAGER; // the widest bar fills the canvas
 
 /* ------------------------------------------------------------------ *
@@ -193,7 +274,7 @@ body.push(
     ls: 1.1,
     cls: fade(0.6, ENDS),
   }),
-  t(32, 358, 'WHEN THEY APPLY — and only then', {
+  t(32, ROW_Y[2] - 12, 'WHEN THEY APPLY — and only then', {
     size: 10.5,
     fill: C.muted,
     ls: 1.1,
@@ -204,22 +285,27 @@ body.push(
 CARDS.forEach((c, i) => {
   const x = cardX(i);
   const y = cardY(i);
+  const w = cardW(i);
+  const h = cardH(i);
   const accent = STROKE[c.kind];
-  const lines = wrap(c.summary, 49).slice(0, 4);
+  const text = CARD_TEXT[i];
   body.push(
     `<g class="${fade(cardAt(i), ENDS, { rise: 10 })}">` +
-      `<rect x="${x}" y="${y}" width="${CARD.w}" height="${CARD.h}" rx="9"` +
+      `<rect x="${x.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="${h}" rx="9"` +
       ` fill="url(#hatch-${c.kind})" stroke="${accent}"` +
       ` stroke-width="${c.chain ? 1.6 : 1.2}"${c.chain ? '' : ' stroke-dasharray="5 3"'}/>` +
-      t(x + 14, y + 24, `$${c.name}`, { size: 12.5, weight: 600, fill: C.white }) +
-      lines
-        .map((l, n) => t(x + 14, y + 44 + n * 12.5, l, { size: 10, fill: C.text, op: 0.92 }))
+      t(x + PAD.left, y + 24, `$${c.name}`, { size: NAME_SIZE, weight: 600, fill: C.white }) +
+      text.lines
+        .map((l, n) =>
+          t(x + PAD.left, y + 44 + n * DESC_STEP, l, { size: text.size, fill: C.text, op: 0.92 }),
+        )
         .join('') +
-      t(x + CARD.w - 12, y + CARD.h - 11, `description ≈ ${c.desc}  ·  body ≈ ${num(c.bodyTokens)}`, {
-        size: 8.8,
-        anchor: 'end',
-        fill: C.faint,
-      }) +
+      t(
+        x + w - PAD.right,
+        y + h - 11,
+        `description ≈ ${c.desc}  ·  body ≈ ${num(c.bodyTokens)}`,
+        { size: 8.8, anchor: 'end', fill: C.faint },
+      ) +
       `</g>`,
   );
 });
@@ -228,8 +314,9 @@ CARDS.forEach((c, i) => {
 {
   const i = CARDS.indexOf(HERO);
   body.push(
-    `<rect x="${cardX(i) - 4}" y="${cardY(i) - 4}" width="${CARD.w + 8}" height="${CARD.h + 8}"` +
-      ` rx="12" fill="none" stroke="${C.orange}" class="${pulse(ACT3, ACT4 + 1.2)}"/>`,
+    `<rect x="${(cardX(i) - 4).toFixed(1)}" y="${cardY(i) - 4}" width="${(cardW(i) + 8).toFixed(1)}"` +
+      ` height="${cardH(i) + 8}" rx="12" fill="none" stroke="${C.orange}"` +
+      ` class="${pulse(ACT3, ACT4 + 1.2)}"/>`,
   );
 }
 
@@ -238,15 +325,15 @@ CARDS.forEach((c, i) => {
  * ------------------------------------------------------------------ */
 body.push(
   `<g class="${fade(ACT2 - 0.5, ENDS)}">` +
-    `<line x1="32" y1="502" x2="972" y2="502" stroke="${C.track}" stroke-width="1.2"/>` +
-    t(32, 528, 'What that actually costs, in the context window', {
+    `<line x1="32" y1="${DIVIDER_Y}" x2="972" y2="${DIVIDER_Y}" stroke="${C.track}" stroke-width="1.2"/>` +
+    t(32, DIVIDER_Y + 26, 'What that actually costs, in the context window', {
       size: 16,
       weight: 700,
       fill: C.white,
     }) +
     t(
       32,
-      549,
+      DIVIDER_Y + 47,
       'Tokens are characters ÷ 4. Both bars are a few percent of Bob’s 270,000-token window — but you pay them on every single turn.',
       { size: 11.5, fill: C.muted },
     ) +
@@ -282,7 +369,7 @@ function segment({ x, y, tokens, kind, tIn, tOut = ENDS, label, sub, inside = tr
 
 /* ---- bar A: what you actually pay ---- */
 body.push(
-  t(32, 582, 'WHAT YOU PAY', {
+  t(32, CAPTION_A, 'WHAT YOU PAY', {
     size: 10.5,
     fill: C.green,
     ls: 1.1,
@@ -328,7 +415,7 @@ body.push(descSeg.svg);
       t(
         lx + 10,
         BAR.aY + BAR.h + 38,
-        'that sliver is the entire cost of having nine skills available',
+        `that sliver is the entire cost of having ${CARDS.length} skills available`,
         { size: 10.5, fill: C.muted },
       ) +
       `</g>`,
@@ -352,7 +439,7 @@ const heroSeg = segment({
 body.push(
   heroSeg.svg,
   `<g class="${fade(ACT3 + 0.4, ENDS)}">` +
-    t(heroX + 4, 582, `↓  $${HERO.name} body  ·  ≈ ${num(HERO.bodyTokens)}, only while it runs`, {
+    t(heroX + 4, CAPTION_A, `↓  $${HERO.name} body  ·  ≈ ${num(HERO.bodyTokens)}, only while it runs`, {
       size: 10.5,
       fill: C.orange,
     }) +
@@ -361,13 +448,13 @@ body.push(
 
 // The running total swaps rather than crossfades, or both numbers show at once.
 body.push(
-  t(964, 582, `≈ ${num(PAID)} tokens a turn`, {
+  t(964, CAPTION_A, `≈ ${num(PAID)} tokens a turn`, {
     size: 11.5,
     anchor: 'end',
     fill: C.text,
     cls: fade(ACT2 + 1.8, ACT3, { cut: true }),
   }),
-  t(964, 582, `≈ ${num(PAID_LOADED)} tokens a turn`, {
+  t(964, CAPTION_A, `≈ ${num(PAID_LOADED)} tokens a turn`, {
     size: 11.5,
     anchor: 'end',
     fill: C.text,
@@ -377,13 +464,13 @@ body.push(
 
 /* ---- bar B: the counterfactual ---- */
 body.push(
-  t(32, 706, 'IF EVERY BODY WERE ALWAYS LOADED', {
+  t(32, CAPTION_B, 'IF EVERY BODY WERE ALWAYS LOADED', {
     size: 10.5,
     fill: C.red,
     ls: 1.1,
     cls: fade(ACT4, ENDS),
   }),
-  t(964, 706, `≈ ${num(EAGER)} tokens a turn`, {
+  t(964, CAPTION_B, `≈ ${num(EAGER)} tokens a turn`, {
     size: 11.5,
     anchor: 'end',
     fill: C.red,
@@ -420,14 +507,14 @@ body.push(
   `<g class="${fade(CLOSE, ENDS, { rise: 6 })}">` +
     t(
       32,
-      802,
-      `Same nine skills. ${RATIO.toFixed(0)}× the context, spent on instructions you are not using — and context you spend is context compaction will take.`,
+      CLOSING_Y,
+      `Same ${CARDS.length} skills. ${RATIO.toFixed(0)}× the context, spent on instructions you are not using — and context you spend is context compaction will take.`,
       { size: 12.5, fill: C.text },
     ) +
     `</g>`,
   t(
     W / 2,
-    834,
+    CLOSING_Y + 32,
     `type $ in Bob to pick one   ·   the ${RULE_COUNT} rules in .bob/rules/ are the opposite: tiny on purpose, because they do load every turn`,
     { size: 10.5, anchor: 'middle', fill: C.faint, ls: 0.4 },
   ),
@@ -439,7 +526,7 @@ body.push(
 const svg = assemble({
   width: W,
   height: H,
-  title: `${CARDS.length} skills, one line each — why having nine costs almost nothing`,
+  title: `${CARDS.length} skills, one line each — why having them all costs almost nothing`,
   desc:
     `An animated diagram of the kit's ${CARDS.length} Bob skills. The six main-chain skills and the ` +
     'three situational ones appear in turn as cards, each showing its one-line description ' +

@@ -8,6 +8,48 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **`improve-prompt-kit/` — `improve-prompt` as a complete, portable skill.**
+  Students asked whether it was a whole skills kit with its own `AGENTS.md`,
+  `SKILL.md`, examples and references, so that it works in any harness or IDE.
+  It is now. The kit is markdown and nothing else — no code, no dependencies,
+  no network calls — with install notes for Bob, Claude Code, Cursor-style rule
+  editors, and a `PROMPT.md` to paste into a chat window with no file support
+  at all. A test fails if anything in the skill body ties it to one harness.
+- **`$improve-prompt` is now the tenth skill**, not only a slash command. The
+  method lives in the skill; the Bob command is a thin entry point that adds the
+  project-specific part a portable skill cannot assume. `tools/build-improve-prompt-kit.mjs`
+  keeps the three copies in step and a test fails if they drift.
+- **`CHEATSHEET.md`** — the commands, the ten skills, the four rules and the
+  numbers on one page, generated from `payload/` so it cannot go stale.
+  Published to the wiki as `Cheat-Sheet.md` from the same source.
+- **`assets/chain.svg`** — an animated strip of the six stages, under the Build
+  Flow banner where a plain code fence used to be. The whole chain stays
+  visible while a highlight walks it, with one line per stage saying what it is
+  for and which skill runs it.
+
+### Fixed
+
+- **`references/evidence.md` hung outside its card** on the published Build Flow
+  diagram. Two causes, both fixed: `wrap` treated a path as one unbreakable word,
+  and the characters-per-pixel ratio used to size text was a guess. The ratio is
+  now measured with `getComputedTextLength` (0.62 for semibold, not the assumed
+  0.52 — which is why a string predicted at 110px rendered at 130px in a 109px
+  box), `wrap` breaks a long path at `/`, and both diagram generators refuse to
+  emit a card whose text does not fit.
+- **Card and section heights are now derived from their content** in both the
+  Build Flow and skills diagrams, so fixing a horizontal overflow cannot create
+  a vertical one, and adding a skill moves the layout instead of being drawn
+  over it.
+
+### Changed
+
+- **The skills diagram lays the chain and the situational skills out
+  separately** — three wide columns for the six-stage chain, one row of four for
+  the rest — so a tenth skill does not leave a ragged hole in a 3-wide grid.
+  Every count on it, and in the banner's description, is read from the payload.
+
+### Added
+
 - **`/improve-prompt`** — a second slash command, asked for by a student. Type
   it in front of a rough request and you get back a structured prompt, a table
   of what changed and why, the parts that should move out of the prompt and into

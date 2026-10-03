@@ -36,7 +36,8 @@ shows this in 24 seconds. Watch it once.
 
 **Doing the work**
 - [The Build Flow](The-Build-Flow) — the six stages, and why that order
-- [Skills Reference](Skills-Reference) — the nine skills and when to reach for each
+- [Cheat Sheet](Cheat-Sheet) — commands, skills, rules and numbers on one page
+- [Skills Reference](Skills-Reference) — the ten skills and when to reach for each
 - [Firecrawl](Firecrawl) — how your agent sees the real world
 
 **Doing it well**
