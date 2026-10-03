@@ -6,6 +6,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A social preview card**, `assets/social-card.png`, generated from
+  `assets/social-card.svg` by `npm run build:social` and
+  `npm run build:social-png`. Uploaded under the repository's **Settings →
+  Social preview**, it becomes the `og:image` on the repository page *and* on
+  every wiki page, which is the only image a link preview on LinkedIn or Slack
+  will ever show. It cannot be one of the animated diagrams: a preview crawler
+  embeds `og:image` at a declared pixel size and renders nothing, so SVG is
+  dropped. Its counts come from the payload, like every other generated
+  artefact here, and `assets/social-card.png.sha256` records which SVG the PNG
+  was rasterised from so the image cannot quietly fall behind the numbers.
+- **`docs/social-and-seo.md`** — what GitHub actually serves for this project,
+  checked against the live HTML rather than assumed: wiki pages do carry a full
+  set of Open Graph tags, `og:title` is already the page title, and
+  `og:description` is the repository's About description, which is why that one
+  empty field made every share of every page read "Contribute to … by creating
+  an account on GitHub."
+
 ### Changed
 
 - **Three wiki pages renamed** to the titles Gregory gave them on GitHub:

@@ -204,6 +204,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and
 | [docs/student-quickstart.md](docs/student-quickstart.md) | Students, start to finish |
 | [docs/firecrawl-setup.md](docs/firecrawl-setup.md) | Getting and storing the free key |
 | [docs/architecture.md](docs/architecture.md) | How the installer works, and why |
+| [docs/social-and-seo.md](docs/social-and-seo.md) | Link previews, alt text, and what GitHub lets us control |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Adding a skill, example or reference |
 
 ## Licence
