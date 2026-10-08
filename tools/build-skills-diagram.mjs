@@ -57,7 +57,13 @@ const CHAIN = [
   ['build-evals', 'orange'],
   ['demo-rehearsal', 'orange'],
 ];
-const SITUATIONAL = ['improve-prompt', 'wizard', 'rag-architecture', 'harness-tuning'];
+const SITUATIONAL = [
+  'improve-prompt',
+  'wizard',
+  'rag-architecture',
+  'harness-tuning',
+  'read-applicant-sources',
+];
 
 /**
  * The chain warms from blue to orange across the six stages, matching the build

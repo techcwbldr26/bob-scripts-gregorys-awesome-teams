@@ -1,0 +1,241 @@
+{
+  "retrieved": "2026-10-07",
+  "creditsUsed": 0,
+  "pages": [
+    {
+      "slug": "usa-benefits",
+      "url": "https://www.usa.gov/benefits",
+      "ok": true,
+      "title": "Government benefits | USAGov",
+      "chars": 3372,
+      "saved": 3372,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "usda-snap",
+      "url": "https://www.fna.usda.gov/snap/supplemental-nutrition-assistance-program",
+      "ok": true,
+      "title": "Supplemental Nutrition Assistance Program (SNAP) | Food and Nutrition Administration",
+      "chars": 12208,
+      "saved": 12208,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "medicaid",
+      "url": "https://www.medicaid.gov/",
+      "ok": true,
+      "title": "Medicaid.gov: The Official U.S. Government Site for Medicaid and CHIP Services | Medicaid",
+      "chars": 4378,
+      "saved": 4378,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "healthcare",
+      "url": "https://www.healthcare.gov/",
+      "ok": true,
+      "title": "Welcome to the Health Insurance Marketplace\u00ae | HealthCare.gov",
+      "chars": 3793,
+      "saved": 3793,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "acf",
+      "url": "https://acf.gov/",
+      "ok": true,
+      "title": "Welcome to ACF | The Administration for Children and Families",
+      "chars": 12279,
+      "saved": 12279,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "hud-public-housing",
+      "url": "https://www.hud.gov/helping-americans/public-housing",
+      "ok": true,
+      "title": "Public Housing Program | HUD.gov / U.S. Department of Housing and Urban Development (HUD)",
+      "chars": 8586,
+      "saved": 8586,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "hud-pha-contacts",
+      "url": "https://www.hud.gov/contactus/public-housing-contacts",
+      "ok": true,
+      "title": "PHA Contact Information | HUD.gov / U.S. Department of Housing and Urban Development (HUD)",
+      "chars": 3845,
+      "saved": 3845,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "united-way-211",
+      "url": "https://www.211.org/",
+      "ok": true,
+      "title": "Call 211 for Essential Community Services | United Way 211",
+      "chars": 2066,
+      "saved": 2066,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "snap-participation",
+      "url": "https://www.fna.usda.gov/pd/supplemental-nutrition-assistance-program-snap",
+      "ok": true,
+      "title": "SNAP Data Tables | Food and Nutrition Administration",
+      "chars": 3754,
+      "saved": 3754,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "cms-enrollment",
+      "url": "https://www.medicaid.gov/medicaid/national-medicaid-chip-program-information/medicaid-chip-enrollment-data",
+      "ok": true,
+      "title": "Medicaid & CHIP Enrollment Data | Medicaid",
+      "chars": 5108,
+      "saved": 5108,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "hud-pit",
+      "url": "https://www.hudexchange.info/programs/hdx/pit-hic/",
+      "ok": true,
+      "title": "Point-in-Time Count and Housing Inventory Count - HUD Exchange",
+      "chars": 13772,
+      "saved": 13772,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "hud-subsidized-households",
+      "url": "https://www.huduser.gov/portal/datasets/assthsg.html",
+      "ok": true,
+      "title": "Picture of Subsidized Households: HUD-Assisted Housing Data | HUD USER",
+      "chars": 66323,
+      "saved": 20026,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "liheap",
+      "url": "https://acf.gov/ocs/programs/liheap",
+      "ok": true,
+      "title": "Low Income Home Energy Assistance Program (LIHEAP) | The Administration for Children and Families",
+      "chars": 7617,
+      "saved": 7617,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "data-gov",
+      "url": "https://data.gov/",
+      "ok": true,
+      "title": "Data.gov Home - Data.gov",
+      "chars": 3938,
+      "saved": 3938,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "mita",
+      "url": "https://www.medicaid.gov/medicaid/data-systems/medicaid-information-technology-architecture",
+      "ok": true,
+      "title": "Medicaid Information Technology Architecture | Medicaid",
+      "chars": 1737,
+      "saved": 1737,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "medicaid-enterprise-certification",
+      "url": "https://www.medicaid.gov/medicaid/data-systems/medicaid-enterprise-certification-toolkit",
+      "ok": true,
+      "title": "Medicaid Enterprise Certification Toolkit | Medicaid",
+      "chars": 5211,
+      "saved": 5211,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "sam-contracting",
+      "url": "https://sam.gov/contracting",
+      "ok": true,
+      "title": "Contracting | SAM.gov",
+      "chars": 4091,
+      "saved": 4091,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "ny-medicaid-manuals",
+      "url": "https://www.emedny.org/providermanuals/",
+      "ok": true,
+      "title": "\n\tProvider Manuals\n",
+      "chars": 12477,
+      "saved": 12477,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "medicaid-state-profiles",
+      "url": "https://www.medicaid.gov/state-overviews/state-profiles",
+      "ok": true,
+      "title": "State Profiles | Medicaid",
+      "chars": 2078,
+      "saved": 2078,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "acs",
+      "url": "https://www.census.gov/programs-surveys/acs.html",
+      "ok": true,
+      "title": "American Community Survey (ACS)",
+      "chars": 7374,
+      "saved": 7374,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "211-impact-2025",
+      "url": "https://www.unitedway.org/the-facts-about-211-2025-impact-snapshot",
+      "ok": true,
+      "title": "United Way | 211 Impact Survey Results 2025 | United Way Worldwide",
+      "chars": 6737,
+      "saved": 6737,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "gao-reports",
+      "url": "https://www.gao.gov/reports-testimonies",
+      "ok": true,
+      "title": "Reports & Testimonies | U.S. GAO",
+      "chars": 13924,
+      "saved": 13924,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "nasact",
+      "url": "https://www.nasact.org/",
+      "ok": true,
+      "title": "NASACT",
+      "chars": 7144,
+      "saved": 7144,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "nasbo-expenditure",
+      "url": "https://www.nasbo.org/reports-data/state-expenditure-report",
+      "ok": true,
+      "title": "\n\tState Expenditure Report - Nasbo\n",
+      "chars": 6558,
+      "saved": 6558,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "nasbo-budgets",
+      "url": "https://www.nasbo.org/resources/proposed-enacted-budgets",
+      "ok": true,
+      "title": "\n\tProposed & Enacted Budgets - Nasbo\n",
+      "chars": 17543,
+      "saved": 17543,
+      "creditsUsed": 0
+    },
+    {
+      "slug": "ncsl",
+      "url": "https://www.ncsl.org/",
+      "ok": true,
+      "title": "\n\tLegislative News, Studies and Analysis | National Conference of State Legislatures\n",
+      "chars": 5734,
+      "saved": 5734,
+      "creditsUsed": 0
+    }
+  ],
+  "scrapeCreditsSecondPass": 0
+}

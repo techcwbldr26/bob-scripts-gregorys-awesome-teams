@@ -3,7 +3,7 @@
 One page. Everything you type, and everything that can run.
 Generated from the kit itself — if it is on this page, it is installed.
 
-**10 skills · 2 commands · 4 always-on rules · demo day December 2026**
+**11 skills · 2 commands · 4 always-on rules · demo day December 2026**
 
 ---
 
@@ -53,6 +53,7 @@ Not part of the chain. Use them the moment they are relevant.
 | `$harness-tuning` | Diagnose and fix the Bob harness itself when it behaves badly — ignoring rules, forgetting context, stopping early, burning Bobcoins, or failing to load skills and MCP tools. | the problem is the agent's setup rather than the project's code |
 | `$improve-prompt` | Rewrite a rough prompt into a well-structured one and show what changed, so the person learns the shape rather than just receiving a better prompt. | someone asks to improve, fix, sharpen or "prompt engineer" a request, or pastes a prompt and asks what is wrong with it |
 | `$rag-architecture` | Design retrieval-augmented generation over the team's own documents or data, and make it measurable. | the product answers questions from a corpus, needs citations, or when "we will use RAG" has not yet been turned into chunking, retrieval and evaluation decisions |
+| `$read-applicant-sources` | Read the saved official benefit pages before asking an applicant anything or answering their question. | someone is applying for SNAP or another benefit, when deciding what to ask an applicant, when a Rhode Island applicant asks about eligibility, documents, income limits, or renewal, or when a benefit amount or rule would otherwise come from memory |
 | `$wizard` | Generate an interactive setup script that walks a human through a manual procedure the agent cannot do itself. | the next blocker is a dashboard a person must click through, an API key only they can mint, a one-off migration, or steps that would otherwise be written into a README |
 
 ---

@@ -1,8 +1,8 @@
 # Skills Reference
 
-![An animated diagram of the ten skills. Each card shows one skill’s one-line description and what its body would cost, and a running readout counts the descriptions up to roughly 665 tokens. A stacked bar then compares what you actually pay in the context window — Bob’s baseline plus that sliver, plus one body while it runs — against what it would cost if all ten bodies were loaded on every turn.](https://raw.githubusercontent.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/main/assets/skills.svg)
+![An animated diagram of the 11 skills. Each card shows one skill’s one-line description and what its body would cost, and a running readout counts the descriptions up to roughly 665 tokens. A stacked bar then compares what you actually pay in the context window — Bob’s baseline plus that sliver, plus one body while it runs — against what it would cost if all ten bodies were loaded on every turn.](https://raw.githubusercontent.com/techcwbldr26/bob-scripts-gregorys-awesome-teams/main/assets/skills.svg)
 
-Ten skills. Type `$` in Bob to pick from a list, `$skill-name` to invoke one
+11 skills. Type `$` in Bob to pick from a list, `$skill-name` to invoke one
 directly, or just describe what you need and Bob will reach for the right one.
 
 Only each skill's one-line description sits in context. The body loads on demand,
@@ -163,6 +163,22 @@ fortnight in projects like yours.
 
 It diagnoses in cost order: context, then skills, then MCP tools, then
 instructions, then the prompt, and only last the model.
+
+---
+
+### `$read-applicant-sources`
+> Read the saved official benefit pages before asking an applicant anything or
+> answering their question.
+
+**Reach for it:** when someone is applying for SNAP or another benefit, when
+deciding what to ask an applicant, or when a benefit amount would otherwise
+come from memory.
+
+**It reads:** `references/public-sources.md`, then the saved page for that
+program and state. For Rhode Island SNAP that includes the DHS-2 form.
+
+**It is working when** every dollar amount and deadline was just read from a
+saved file, and SNAP questions are only the ones tagged SNAP.
 
 ---
 

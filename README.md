@@ -78,12 +78,12 @@ your-project/
 │   │   ├── gregorys-awesome-teams.md    Routes an idea into the build flow
 │   │   └── improve-prompt.md            Rewrites a rough prompt, and explains it
 │   ├── rules/                  Four always-on rules
-│   └── skills/                 Ten skills, loaded on demand
+│   └── skills/                 11 skills, loaded on demand
 ├── examples/                   Worked artefacts to copy
 └── references/                 Depth Bob reads only when a skill cites it
 ```
 
-### The ten skills
+### The 11 skills
 
 | Skill | What it does |
 | --- | --- |
@@ -97,11 +97,12 @@ your-project/
 | `$rag-architecture` | Turn "we'll use RAG" into real chunking and retrieval decisions |
 | `$harness-tuning` | Diagnose Bob itself when it is the thing misbehaving |
 | `$improve-prompt` | Rewrite a rough prompt and show what changed, so you learn the shape |
+| `$read-applicant-sources` | Read saved official benefit pages before asking or answering an applicant |
 
 `$grill-with-docs` and `$wizard` are adaptations of Matt Pocock's skills of the
 same names (MIT). See [NOTICE.md](NOTICE.md).
 
-**All of it on one page:** [CHEATSHEET.md](CHEATSHEET.md) — the commands, the ten
+**All of it on one page:** [CHEATSHEET.md](CHEATSHEET.md) — the commands, the 11
 skills, the four rules and the numbers. Generated from the kit, so it cannot go
 stale.
 
